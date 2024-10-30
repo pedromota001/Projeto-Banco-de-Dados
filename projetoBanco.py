@@ -12,7 +12,18 @@ try:
         cursor = conexao.cursor();
         cursor.execute("CREATE DATABASE IF NOT EXISTS webDriver_db")
         print("DataBase criado com sucesso")
-        cursor.database = 'webdriver_db'
+        cursor.execute("USE webdriver_db")
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS planos(
+            id BIGINT AUTO_INCREMENT,
+            nome VARCHAR(20) NOT NULL,
+            duracao FLOAT,
+            data_aquisicao VARCHAR(20),
+            espaco_por_usuario FLOAT, 
+            PRIMARY KEY(id) 
+        )
+        """)
+        print("Tabela criada com sucesso")
 except mysql.connector.Error as erro:
     print(f"conexao mal sucedida: {erro}")
 finally:
