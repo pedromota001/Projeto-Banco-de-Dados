@@ -60,6 +60,7 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'usuarios' criada com sucesso.")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS arquivos(
             id_arquivo INT AUTO_INCREMENT,
@@ -75,6 +76,7 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'arquivos' criada com sucesso")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS comentarios(
             id_comentario INT AUTO_INCREMENT, 
@@ -89,6 +91,7 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'comentarios' criada com sucesso")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS historico_versionamento(
             id_historico INT AUTO_INCREMENT,
@@ -103,6 +106,7 @@ def criar_tabelas(cursor):
         ); 
     """)
     print("Tabela 'historico_versionamento' criada com sucesso.")
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS operacoes(
             id_operacoes INT AUTO_INCREMENT,
@@ -140,6 +144,18 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'administradores' criada com sucesso.")
+
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS adm_usuarios(
+                id_adm INT,
+                id_usuario INT,
+                FOREIGN KEY (id_adm) REFERENCES admnistradores(id_adm),
+                FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+            ); 
+        """)
+    print("Tabela 'adm_usuarios' criada com sucesso.")
+
+
 
 def main():
     conexao = criar_conexao()
