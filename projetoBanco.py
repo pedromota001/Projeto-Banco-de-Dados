@@ -136,7 +136,7 @@ def criar_tabelas(cursor):
             id_adm INT AUTO_INCREMENT,
             id_usuario INT,
             PRIMARY KEY(id_adm),
-            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario),
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
         );
     """)
     print("Tabela 'administradores' criada com sucesso.")
