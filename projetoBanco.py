@@ -97,6 +97,8 @@ def criar_tabelas(cursor):
             operacao_historico VARCHAR(15),
             id_usuario_alterou INT,
             conteudo_mudado VARCHAR(50),
+            id_arquivo INT,
+            PRIMARY KEY (id_historico),
             FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
         ); 
     """)
