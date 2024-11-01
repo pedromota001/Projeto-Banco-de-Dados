@@ -1,29 +1,40 @@
 import mysql.connector
+from mysql.connector import Error
 
-try:
-    conexao = mysql.connector.connect(
-        host= "127.0.0.1",
-        port= "3306",
-        user="root",
-        password="pedro123"
-    )
-    if(conexao.is_connected()):
-        print("Conexao bem sucedida")
-        cursor = conexao.cursor();
-        cursor.execute("CREATE DATABASE IF NOT EXISTS webDriver_db")
-        print("DataBase criado com sucesso")
-        cursor.execute("USE webdriver_db")
-        cursor.execute("""
+def criar_conexao():
+    try:
+        conexao = mysql.connector.connect(
+            host="127.0.0.1",
+            port="3306",
+            user="root",
+            password="pedro123"
+        )
+        if conexao.is_connected():
+            print("Conexão com o banco de dados bem-sucedida.")
+            return conexao
+    except Error as erro:
+        print(f"Erro ao conectar ao banco de dados: {erro}")
+        return None
+
+def criar_banco_de_dados(cursor):
+    cursor.execute("CREATE DATABASE IF NOT EXISTS webDriver_db")
+    print("Banco de dados 'webDriver_db' criado com sucesso.")
+    cursor.execute("USE webDriver_db")
+
+def criar_tabelas(cursor):
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS planos(
             id INT AUTO_INCREMENT,
             nome VARCHAR(20) NOT NULL,
             duracao FLOAT,
             data_aquisicao VARCHAR(20),
             espaco_por_usuario FLOAT, 
-            PRIMARY KEY(id) 
+            PRIMARY KEY(id)
         );
-        """)
-        cursor.execute("""
+    """)
+    print("Tabela 'planos' criada com sucesso.")
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS instituicoes(
             id_instituicao INT AUTO_INCREMENT,
             nome VARCHAR(20) NOT NULL,
@@ -33,22 +44,36 @@ try:
             PRIMARY KEY(id_instituicao),
             FOREIGN KEY(id_plano) REFERENCES planos(id)
         );
-        """)
-        cursor.execute("""
+    """)
+    print("Tabela 'instituicoes' criada com sucesso.")
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios(
             id_usuario INT AUTO_INCREMENT,
             email VARCHAR(20) NOT NULL,
-            senha VARCHAR(20) NOT NULL, 
+            senha VARCHAR(20) NOT NULL,
             login VARCHAR(15) NOT NULL,
             data_ingresso DATE,
-            id_instituicao INT, 
+            id_instituicao INT,
             PRIMARY KEY(id_usuario),
             FOREIGN KEY(id_instituicao) REFERENCES instituicoes(id_instituicao)
         );
-        """)
-        print("Tabelas criadas com sucesso")
-except mysql.connector.Error as erro:
-    print(f"conexao mal sucedida: {erro}")
-finally:
-    if(conexao.is_connected()):
-        conexao.close()
+    """)
+    print("Tabela 'usuarios' criada com sucesso.")
+
+def main():
+    conexao = criar_conexao()
+    if conexao:
+        try:
+            cursor = conexao.cursor()
+            criar_banco_de_dados(cursor)
+            criar_tabelas(cursor)
+        except Error as erro:
+            print(f"Erro ao criar banco de dados ou tabelas: {erro}")
+        finally:
+            cursor.close()
+            conexao.close()
+            print("Conexão encerrada.")
+
+if __name__ == "__main__":
+    main()
