@@ -104,8 +104,8 @@ def criar_tabelas(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS operacoes(
             id_operacoes INT AUTO_INCREMENT,
-            data_historico DATE,
-            hora_historico TIME,
+            data_op DATE,
+            hora_op TIME,
             tipo_operacao VARCHAR(15),
             id_arquivo INT,
             id_usuario INT,
