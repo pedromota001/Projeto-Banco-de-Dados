@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 
 import BuscasNoBanco
+from BuscasNoBanco import buscar_arquivos_usuario
 
 
 def criar_conexao():
@@ -171,6 +172,7 @@ def insert_Arquivos(cursor, id_usuario):
     cursor.execute("""
     INSERT INTO arquivos(permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario)VALUES(%s,%s,%s,%s,%s,%s, %s);
     """, (permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario))
+    print("Insercao efetuada com sucesso! ")
 
 
 def exibeMenu():
@@ -197,12 +199,21 @@ def exibeMenuUsuario(conexao):
             print("""
             Opcoes:
             1 - Inserir arquivo no driver
+            2 - Listar meus arquivos
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
             if op == 1:
                 insert_Arquivos(conexao.cursor(), usuario)
                 conexao.commit()
+            elif op == 2:
+                arquivos = buscar_arquivos_usuario(conexao, usuario)
+                if arquivos:
+                    for arquivo in arquivos:
+                        print(arquivo[0])
+                else:
+                    print("Voce nao tem arquivos no drive")
+
         #implementar outras opcoes
     else:
         print("Usuario nao cadastrado no banco")
