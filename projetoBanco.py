@@ -117,6 +117,20 @@ def criar_tabelas(cursor):
         ); 
     """)
     print("Tabela 'operacoes' criada com sucesso.")
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS compartilhamentos(
+            id_compartilhado INT AUTO_INCREMENT,
+            id_usuario INT,
+            id_arquivo INT,
+            data_compartilhado DATE,
+            PRIMARY KEY(id_compartilhado),
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario),
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+        );
+    """)
+    print("Tabela 'compartilhamentos' criada com sucesso.")
+
 def main():
     conexao = criar_conexao()
     if conexao:
