@@ -60,7 +60,35 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'usuarios' criada com sucesso.")
-
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS arquivos(
+            id_arquivo INT AUTO_INCREMENT,
+            permissao BOOLEAN DEFAULT FALSE,
+            nome VARCHAR(20) NOT NULL,
+            tipo VARCHAR(20) NOT NULL,
+            url VARCHAR(15) UNIQUE NOT NULL, 
+            tam FLOAT NOT NULL,
+            data_compartilhamento DATE,
+            id_usuario INT,
+            PRIMARY KEY(id_arquivo), 
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
+        );
+    """)
+    print("Tabela 'arquivos' criada com sucesso")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS comentarios(
+            id_comentario INT AUTO_INCREMENT, 
+            conteudo VARCHAR(20), 
+            data_comentario DATE,
+            hora_comentario TIME, 
+            id_usuario INT,
+            id_arquivo INT,
+            PRIMARY KEY(id_comentario),
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario),
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+        );
+    """)
+    print("Tabela 'comentarios' criada com sucesso")
 def main():
     conexao = criar_conexao()
     if conexao:
@@ -68,6 +96,11 @@ def main():
             cursor = conexao.cursor()
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
+            print("""
+            OPCOES DE LOGIN:
+            1 - Usuario
+            2 - Administrador
+            """)
         except Error as erro:
             print(f"Erro ao criar banco de dados ou tabelas: {erro}")
         finally:
