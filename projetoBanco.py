@@ -89,6 +89,17 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'comentarios' criada com sucesso")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS historico_versionamento(
+            id_historico INT AUTO_INCREMENT,
+            data_historico DATE,
+            hora_historico TIME,
+            operacao_historico VARCHAR(15),
+            id_usuario_alterou INT,
+            conteudo_mudado VARCHAR(50),
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+        ); 
+    """)
 def main():
     conexao = criar_conexao()
     if conexao:
