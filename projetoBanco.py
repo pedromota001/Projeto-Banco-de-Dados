@@ -130,6 +130,16 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'compartilhamentos' criada com sucesso.")
+    
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS administradores(
+            id_adm INT AUTO_INCREMENT,
+            id_usuario INT,
+            PRIMARY KEY(id_adm),
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario),
+        );
+    """)
+    print("Tabela 'administradores' criada com sucesso.")
 
 def main():
     conexao = criar_conexao()
