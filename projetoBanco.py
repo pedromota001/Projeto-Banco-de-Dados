@@ -100,6 +100,21 @@ def criar_tabelas(cursor):
             FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
         ); 
     """)
+    print("Tabela 'historico_versionamento' criada com sucesso.")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS operacoes(
+            id_operacoes INT AUTO_INCREMENT,
+            data_historico DATE,
+            hora_historico TIME,
+            tipo_operacao VARCHAR(15),
+            id_arquivo INT,
+            id_usuario INT,
+            PRIMARY KEY(id_operacoes),
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo),
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
+        ); 
+    """)
+    print("Tabela 'operacoes' criada com sucesso.")
 def main():
     conexao = criar_conexao()
     if conexao:
