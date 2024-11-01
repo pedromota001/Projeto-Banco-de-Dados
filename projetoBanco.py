@@ -149,8 +149,8 @@ def criar_tabelas(cursor):
             CREATE TABLE IF NOT EXISTS adm_usuarios(
                 id_adm INT,
                 id_usuario INT,
-                FOREIGN KEY (id_adm) REFERENCES admnistradores(id_adm),
-                FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+                FOREIGN KEY(id_adm) REFERENCES administradores(id_adm),
+                FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
             ); 
         """)
     print("Tabela 'adm_usuarios' criada com sucesso.")
