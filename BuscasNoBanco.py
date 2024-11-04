@@ -22,7 +22,7 @@ def buscar_arquivos_usuario(conexao, id_usuario):
     try:
         cursor = conexao.cursor()
         cursor.execute("""
-        SELECT arquivos.nome FROM arquivos INNER JOIN usuarios ON arquivos.id_usuario = usuarios.id_usuario WHERE arquivos.id_usuario = %s; 
+        SELECT arquivos.nome FROM arquivos WHERE arquivos.id_usuario = %s; 
         """, (id_usuario,))
         arquivo = cursor.fetchall()
         if arquivo:
