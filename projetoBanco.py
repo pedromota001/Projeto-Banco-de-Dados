@@ -161,6 +161,16 @@ def criar_tabelas(cursor):
         """)
     print("Tabela 'adm_usuarios' criada com sucesso.")
 
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS suportes(
+                id_suporte INT AUTO_INCRIMENT,
+                dia DATE,
+                hora TIME,
+                descricao VARCHAR(30),
+                FOREIGN KEY(id_adm) REFERENCES administradores(id_adm)
+            ); 
+        """)
+    print("Tabela 'suportes' criada com sucesso.")
 
 def insert_Arquivos(cursor, id_usuario):
     nome = input("Digite o nome do arquivo: ")
