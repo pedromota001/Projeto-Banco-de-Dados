@@ -165,7 +165,7 @@ def criar_tabelas(cursor):
 
     cursor.execute("""
             CREATE TABLE IF NOT EXISTS suportes(
-                id_suporte INT AUTO_INCRIMENT,
+                id_suporte INT AUTO_INCREMENT,
                 dia DATE,
                 hora TIME,
                 descricao VARCHAR(30),
