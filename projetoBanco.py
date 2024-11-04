@@ -1,4 +1,5 @@
 from datetime import datetime
+from traceback import print_tb
 
 import mysql.connector
 from mysql.connector import Error
@@ -56,7 +57,7 @@ def criar_tabelas(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios(
             id_usuario INT AUTO_INCREMENT,
-            email VARCHAR(20) NOT NULL,
+            email VARCHAR(20) UNIQUE NOT NULL,
             senha VARCHAR(20) NOT NULL,
             login VARCHAR(15) NOT NULL,
             data_ingresso DATE,
@@ -195,6 +196,8 @@ def exibeMenu():
             1 - Usuario
             2 - Administrador 
             3 - Se cadastrar como usuario, caso nao tenha conta
+            4 - Atualizar senha
+            5 - Atualizar email
             0 - Encerrar
                     """)
         resp = int(input("Digite sua resposta: "))
@@ -232,6 +235,17 @@ def exibeMenuUsuario(conexao):
     else:
         print("Usuario nao cadastrado no banco")
 
+
+def atualizar(cursor, novoValor, chave, tabela, coluna):
+    query = f"""
+    UPDATE {tabela} 
+    SET {coluna} = %s
+    WHERE email = %s
+    """
+    cursor.execute(query, (novoValor, chave))
+
+
+
 def main():
     conexao = criar_conexao()
     if conexao:
@@ -244,6 +258,19 @@ def main():
                 resp = exibeMenu()
                 if resp == 1:
                     exibeMenuUsuario(conexao)
+                elif resp == 4:
+                    #ajeitar verificacoes a mais
+                    email = str(input("Digite seu email: "))
+                    senha = str(input("Digite a sua senha: "))
+                    senhaConfirma = str(input("Repita a nova senha: "))
+                    if senha == senhaConfirma:
+                        atualizar(cursor, senhaConfirma, email, tabela="usuarios", coluna="senha")
+                        conexao.commit()
+                        print("Senha atualizada!")
+                    else:
+                        print("Nao foi possivel atualizar, as senhas nao coincidem")
+                elif resp == 5:
+                    print("teste")
             print("Encerrando aplicacao...")
         except Error as erro:
             print(f"Erro ao criar banco de dados ou tabelas: {erro}")
