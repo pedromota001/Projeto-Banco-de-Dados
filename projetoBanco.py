@@ -144,9 +144,11 @@ def criar_tabelas(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS administradores(
             id_adm INT AUTO_INCREMENT,
-            id_usuario INT,
+            email VARCHAR(20),
+            senha VARCHAR(15),
+            login VARCHAR(20),
             PRIMARY KEY(id_adm),
-            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
+            data_ingresso DATE
         );
     """)
     print("Tabela 'administradores' criada com sucesso.")
