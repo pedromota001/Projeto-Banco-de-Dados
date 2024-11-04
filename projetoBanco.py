@@ -170,6 +170,7 @@ def criar_tabelas(cursor):
                 hora TIME,
                 descricao VARCHAR(30),
                 PRIMARY KEY(id_suporte),
+                id_adm INT,
                 FOREIGN KEY(id_adm) REFERENCES administradores(id_adm)
             ); 
         """)
