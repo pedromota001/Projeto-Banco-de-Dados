@@ -36,3 +36,21 @@ def buscar_arquivos_usuario(conexao, id_usuario):
         return None
     finally:
         cursor.close()
+
+
+def buscar_arquivos_usuario_view(conexao):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT * FROM arquivos_usuario
+        """)
+        resultados = cursor.fetchall()
+        if resultados:
+            for linha in resultados:
+                print(linha)
+        else:
+            print("Voce nao possui arquivos no drive! ")
+    except Error as erro:
+        print(f"Erro ao buscar view: {erro}")
+    finally:
+        cursor.close()

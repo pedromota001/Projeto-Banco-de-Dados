@@ -5,9 +5,11 @@ import mysql.connector
 from mysql.connector import Error
 
 import BuscasNoBanco
+import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
-from BuscasNoBanco import buscar_arquivos_usuario
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_arquivos_usuario_view
+from CriacaoDeViews import view_arquivo_usuario
 from insercaoNoBanco import insert_arquivos
 
 
@@ -136,11 +138,13 @@ def criar_tabelas(cursor):
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS compartilhamentos(
             id_compartilhado INT AUTO_INCREMENT,
-            id_usuario INT,
+            id_usuario_dono INT,
+            id_usuario_compartilhado INT,
             id_arquivo INT,
             data_compartilhado DATE,
             PRIMARY KEY(id_compartilhado),
-            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario),
+            FOREIGN KEY(id_usuario_dono) REFERENCES usuarios(id_usuario),
+            FOREIGN KEY(id_usuario_compartilhado) REFERENCES usuarios(id_usuario),
             FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
         );
     """)
@@ -219,8 +223,10 @@ def exibeMenuUsuario(conexao):
             print("""
             Opcoes:
             1 - Inserir arquivo no driver
-            2 - Listar meus arquivos
+            2 - Listar apenas MEUS arquivos
             3 - Deletar arquivo do drive
+            4 - Listar arquivos meus e compartilhados
+            5 - Compartilhar arquivo com outro usuario(atraves do email)
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
@@ -243,6 +249,10 @@ def exibeMenuUsuario(conexao):
                 RemocaoNoBanco.removeArquivo(conexao, nomeRemover)
                 print("Remocao concluida!!!")
                 conexao.commit()
+            elif op == 4:
+                CriacaoDeViews.view_arquivo_usuario(conexao,usuario)
+                buscar_arquivos_usuario_view(conexao)
+
         #implementar outras opcoes
     else:
         print("Usuario nao cadastrado no banco")
