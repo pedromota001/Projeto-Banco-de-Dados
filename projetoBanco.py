@@ -181,6 +181,17 @@ def criar_tabelas(cursor):
         """)
     print("Tabela 'suportes' criada com sucesso.")
 
+    cursor.execute("""
+            CREATE TABLE IF NOT EXISTS atividades_recentes(
+                id_atv_rec INT AUTO_INCREMENT,
+                ultima_versao DATE,
+                acesso VARCHAR(2),
+                id_arquivo INT,
+                PRIMARY KEY(id_atv_rec),
+                FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+            ); 
+        """)
+    print("Tabela 'atividades_recentes' criada com sucesso.")
 
 def exibeMenu():
         print("""
