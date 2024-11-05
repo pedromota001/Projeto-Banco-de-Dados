@@ -6,7 +6,10 @@ from mysql.connector import Error
 
 import BuscasNoBanco
 import RemocaoNoBanco
+import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario
+from insercaoNoBanco import insert_arquivos
+
 
 
 def criar_conexao():
@@ -178,18 +181,6 @@ def criar_tabelas(cursor):
         """)
     print("Tabela 'suportes' criada com sucesso.")
 
-def insert_Arquivos(cursor, id_usuario):
-    nome = input("Digite o nome do arquivo: ")
-    tipo = input("Digite o tipo desse arquivo: ")
-    url = input("Digite o url do arquivo: ")
-    tam = input("Digite o tamanho desse arquivo: ")
-    permissao = input("Digite o tipo de permissao desse arquivo: ")
-    data_ult_modificacao = datetime.now()
-    cursor.execute("""
-    INSERT INTO arquivos(permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario)VALUES(%s,%s,%s,%s,%s,%s, %s);
-    """, (permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario))
-    print("Insercao efetuada com sucesso! ")
-
 
 def exibeMenu():
         print("""
@@ -223,7 +214,7 @@ def exibeMenuUsuario(conexao):
             """)
             op = int(input("Digite sua opcao: "))
             if op == 1:
-                insert_Arquivos(conexao.cursor(), usuario)
+                insercaoNoBanco.insert_arquivos(conexao, usuario)
                 conexao.commit()
             elif op == 2:
                 arquivos = buscar_arquivos_usuario(conexao, usuario)
