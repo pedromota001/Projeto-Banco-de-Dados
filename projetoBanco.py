@@ -232,6 +232,15 @@ def exibeMenuUsuario(conexao):
                         print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
                 else:
                     print("Voce nao tem arquivos no drive")
+            elif op == 3:
+                print("Seus arquivos: ")
+                arquivos = buscar_arquivos_usuario(conexao, usuario)
+                for arquivo in arquivos:
+                    print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
+                nomeRemover = str(input("Digite o nome do arquivo que voce deseja remover: "))
+                RemocaoNoBanco.removeArquivo(conexao, nomeRemover)
+                print("Remocao concluida!!!")
+                conexao.commit()
         #implementar outras opcoes
     else:
         print("Usuario nao cadastrado no banco")
