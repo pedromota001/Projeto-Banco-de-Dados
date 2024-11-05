@@ -22,11 +22,13 @@ def buscar_arquivos_usuario(conexao, id_usuario):
     try:
         cursor = conexao.cursor()
         cursor.execute("""
-        SELECT arquivos.nome FROM arquivos WHERE arquivos.id_usuario = %s; 
+        SELECT usuarios.email, arquivos.nome FROM usuarios 
+        INNER JOIN arquivos ON usuarios.id_usuario = arquivos.id_usuario
+        WHERE usuarios.id_usuario = %s; 
         """, (id_usuario,))
-        arquivo = cursor.fetchall()
-        if arquivo:
-            return arquivo
+        arquivosEncontrados = cursor.fetchall()
+        if arquivosEncontrados:
+            return arquivosEncontrados
         else:
             return None
     except Error as erro:

@@ -5,6 +5,7 @@ import mysql.connector
 from mysql.connector import Error
 
 import BuscasNoBanco
+import RemocaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario
 
 
@@ -72,7 +73,7 @@ def criar_tabelas(cursor):
         CREATE TABLE IF NOT EXISTS arquivos(
             id_arquivo INT AUTO_INCREMENT,
             permissao BOOLEAN DEFAULT FALSE,
-            nome VARCHAR(20) NOT NULL,
+            nome VARCHAR(20) UNIQUE NOT NULL,
             tipo VARCHAR(20) NOT NULL,
             url VARCHAR(15) UNIQUE NOT NULL, 
             tam FLOAT NOT NULL,
@@ -217,6 +218,7 @@ def exibeMenuUsuario(conexao):
             Opcoes:
             1 - Inserir arquivo no driver
             2 - Listar meus arquivos
+            3 - Deletar arquivo do drive
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
@@ -227,10 +229,9 @@ def exibeMenuUsuario(conexao):
                 arquivos = buscar_arquivos_usuario(conexao, usuario)
                 if arquivos:
                     for arquivo in arquivos:
-                        print(arquivo[0])
+                        print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
                 else:
                     print("Voce nao tem arquivos no drive")
-
         #implementar outras opcoes
     else:
         print("Usuario nao cadastrado no banco")
