@@ -19,7 +19,7 @@ def view_arquivo_usuario(conexao):
     finally:
         cursor.close()
 
-def criar_view_administradores(conexao, cursor):
+def view_administradores(conexao, cursor):
     try:
         cursor = conexao.cursor()
         cursor.execute("""
@@ -47,7 +47,7 @@ def criar_view_administradores(conexao, cursor):
             LEFT JOIN 
                 historico_versionamento h ON h.id_arquivo = a.id_arquivo;
         """)
-        print(" A view: 'view_administradores' foi criada com sucesso!!")
+        print(" A view: 'view_administradores' foi criada com sucesso!")
     except Error as erro:
         print(f"Nao foi possivel criar a view: {erro}")
     finally:
