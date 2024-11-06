@@ -229,8 +229,8 @@ def exibeMenuUsuario(conexao):
     login = str(input("Digite seu login: "))
     senha = str(input("Digite sua senha: "))
     usuario = BuscasNoBanco.buscar_usuario(conexao, login, senha)
-    defineUserLogado(conexao, usuario)
     if usuario:
+        defineUserLogado(conexao, usuario)
         op = -1
         print("Bem vindo!!!!")
         while op != 0:
