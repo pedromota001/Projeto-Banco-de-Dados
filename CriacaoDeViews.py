@@ -19,7 +19,39 @@ def view_arquivo_usuario(conexao):
     finally:
         cursor.close()
 
-
+def criar_view_administradores(conexao, cursor):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+            CREATE OR REPLACE VIEW view_administradores As 
+            SELECT
+                u.id_usuariom, u.email, u.login, u.data_ingresso,
+                i.id_instituicao, i.nome AS nome_instituicao, i.endereco, i.causa_social,
+                p.id AS id_plano, p.nome AS nome_plano, p.duracao, p.espaco_por_usuario,
+                a.id_arquivo, a.nome AS nome_arquivo, a.tipo, a.url, a.tam, a.data_ult_modificacao,
+                c.id_comentario, c.conteudo AS comentario, c.data_comentario, c.hora_comentario,
+                o.id_operacoes, o.tipo_operacao, o.data_op, o.hora_op,
+                h.id_historico, h.operacao_historico, h.data_historico, h.hora_historico
+            FROM 
+                usuarios u
+            JOIN 
+                instituicoes i ON u.id_instituicao = i.id_instituicao
+            JOIN 
+                planos p ON i.id_plano = p.id
+            LEFT JOIN 
+                arquivos a ON a.id_usuario = u.id_usuario
+            LEFT JOIN 
+                comentarios c ON c.id_usuario = u.id_usuario
+            LEFT JOIN 
+                operacoes o ON o.id_usuario = u.id_usuario
+            LEFT JOIN 
+                historico_versionamento h ON h.id_arquivo = a.id_arquivo;
+        """)
+        print(" A view: 'view_administradores' foi criada com sucesso!!")
+    except Error as erro:
+        print(f"Nao foi possivel criar a view: {erro}")
+    finally:
+        cursor.close()
 
 def view_historico_usuario(conexao):
     try:
