@@ -8,9 +8,11 @@ import BuscasNoBanco
 import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
+import CriacaoDeRoles
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_arquivos_usuario_view
 from CriacaoDeViews import view_arquivo_usuario
 from insercaoNoBanco import insert_arquivos
+from CriacaoDeRoles import cria_role_PapelAdm
 
 
 
@@ -39,7 +41,7 @@ def criar_tabelas(cursor):
         CREATE TABLE IF NOT EXISTS planos(
             id INT AUTO_INCREMENT,
             nome VARCHAR(20) NOT NULL,
-            duracao FLOAT,
+            duracao INT,
             data_aquisicao VARCHAR(20),
             espaco_por_usuario FLOAT, 
             PRIMARY KEY(id)
@@ -231,6 +233,7 @@ def exibeMenuUsuario(conexao):
     usuario = BuscasNoBanco.buscar_usuario(conexao, login, senha)
     if usuario:
         defineUserLogado(conexao, usuario)
+        view_arquivo_usuario(conexao)
         op = -1
         print("Bem vindo!!!!")
         while op != 0:
@@ -271,11 +274,15 @@ def exibeMenuUsuario(conexao):
     else:
         print("Usuario nao cadastrado no banco")
 
+def setAdmRole(conexao):
+    pass
+##implementar
 
-def exibe_menu_adm():
+
+def exibe_menu_adm(conexao):
     login = str(input("Digite seu login: "))
     senha = str(input("Digite sua senha: "))
-    adm = BuscasNoBanco.buscar_adm()
+    adm = BuscasNoBanco.buscar_adm(conexao, login, senha)
     if adm:
         op = -1
         print("Bem vindo!!!")
@@ -289,9 +296,10 @@ def exibe_menu_adm():
             """)
             op = int(input("Digite sua opção: "))
             if op == 1:
-                insercaoNoBanco.inserir_planos(conexao)
+                insercaoNoBanco.insert_planos(conexao)
             elif op == 2:
-                insercaoNoBanco.inserir_instituicao(conexao)
+
+                insercaoNoBanco.insert_instituicao(conexao)
             elif op == 3:
                 insercaoNoBanco.inserir_usuario(conexao)
             elif op == 4:
@@ -317,14 +325,15 @@ def main():
             cursor = conexao.cursor()
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
-            view_arquivo_usuario(conexao)
+            CriacaoDeViews.view_administradores(conexao)
+            CriacaoDeRoles.cria_role_PapelAdm(conexao)
             resp = -1
             while (resp != 0):
                 resp = exibeMenu()
                 if resp == 1:
                     exibeMenuUsuario(conexao)
                 elif resp == 2:
-                    pass
+                    exibe_menu_adm(conexao)
                 elif resp == 4:
                     #ajeitar verificacoes a mais
                     email = str(input("Digite seu email: "))

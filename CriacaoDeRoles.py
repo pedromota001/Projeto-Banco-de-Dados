@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 
-def cria_role_PapelUsuario(conexao, id_usuario):
+def cria_role_PapelUsuario(conexao):
     try:
         cursor = conexao.cursor()
         cursor.execute("CREATE ROLE PapelUsuario")
@@ -37,7 +37,8 @@ def cria_role_PapelAdm(conexao):
     try:
         cursor = conexao.cursor()
         cursor.execute("CREATE ROLE PapelAdm")
-        cursor.execute("GRANT ALL PRIVILEGES ON DATABASE webdriver_db TO PapelAdm")
+        cursor.execute("GRANT ALL PRIVILEGES ON webdriver_db TO PapelAdm")
+        cursor.execute("GRANT SELECT ON view_administradores TO PapelAdm")
         conexao.commit()
         print("Role 'PapelAdm' criada com sucesso.")    
     except Exception as erro:

@@ -25,13 +25,14 @@ def insert_planos(conexao):
     try:
         cursor = conexao.cursor()
         nome = input("Digite o nome do plano: ")
-        duracao = float(input("Digite a duração do plano (em meses): "))
+        duracao = int(input("Digite a duração do plano (em meses): "))
         data_aquisicao = input("Digite a data de aquisição (AAAA-MM-DD): ")
         espaco_por_usuario = float(input("Digite o espaço por usuário (em GB): "))
         cursor.execute("""
         INSERT INTO planos(nome, duracao, data_aquisicao, espaco_por_usuario) 
         VALUES (%s, %s, %s, %s);
         """, (nome, duracao, data_aquisicao, espaco_por_usuario))
+        conexao.commit()
         print("Plano inserido com sucesso!")
     except Error as erro:
         print(f"Erro ao inserir plano: {erro}")

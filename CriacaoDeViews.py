@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 
-def view_arquivo_usuario(conexao):
+def view_arquivo_usuario(conexao, id_usuario):
     try:
         cursor = conexao.cursor()
         cursor.execute("""
@@ -19,19 +19,19 @@ def view_arquivo_usuario(conexao):
     finally:
         cursor.close()
 
-def view_administradores(conexao, cursor):
+def view_administradores(conexao):
     try:
         cursor = conexao.cursor()
         cursor.execute("""
             CREATE OR REPLACE VIEW view_administradores As 
             SELECT
-                u.id_usuariom, u.email, u.login, u.data_ingresso,
-                i.id_instituicao, i.nome AS nome_instituicao, i.endereco, i.causa_social,
-                p.id AS id_plano, p.nome AS nome_plano, p.duracao, p.espaco_por_usuario,
-                a.id_arquivo, a.nome AS nome_arquivo, a.tipo, a.url, a.tam, a.data_ult_modificacao,
-                c.id_comentario, c.conteudo AS comentario, c.data_comentario, c.hora_comentario,
-                o.id_operacoes, o.tipo_operacao, o.data_op, o.hora_op,
-                h.id_historico, h.operacao_historico, h.data_historico, h.hora_historico
+                u.email, u.login, u.data_ingresso,
+                i.nome AS nome_instituicao, i.endereco, i.causa_social,
+                p.nome AS nome_plano, p.duracao, p.espaco_por_usuario,
+                a.nome AS nome_arquivo, a.tipo, a.url, a.tam, a.data_ult_modificacao,
+                c.conteudo AS comentario, c.data_comentario, c.hora_comentario,
+                o.tipo_operacao, o.data_op, o.hora_op,
+                h.operacao_historico, h.data_historico, h.hora_historico
             FROM 
                 usuarios u
             JOIN 
