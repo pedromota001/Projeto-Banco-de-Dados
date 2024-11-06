@@ -54,3 +54,22 @@ def buscar_arquivos_usuario_view(conexao):
         print(f"Erro ao buscar view: {erro}")
     finally:
         cursor.close()
+
+
+
+def buscar_adm(conexao, login, senha):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT * FROM administradores WHERE login = %s AND senha = %s
+        """, (login, senha))
+        adm = cursor.fetchone()
+        if adm:
+            return adm[0]
+        else:
+            return None
+    except Error as erro:
+        print(f"Não foi possivel buscar o administrador: {erro}")
+        return None
+    finally:
+        cursor.close()  

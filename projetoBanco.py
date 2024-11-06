@@ -272,6 +272,34 @@ def exibeMenuUsuario(conexao):
         print("Usuario nao cadastrado no banco")
 
 
+def exibe_menu_adm():
+    login = str(input("Digite seu login: "))
+    senha = str(input("Digite sua senha: "))
+    adm = BuscasNoBanco.buscar_adm()
+    if adm:
+        op = -1
+        print("Bem vindo!!!")
+        while(op != 0):
+            print("""
+            1 - Inserir planos
+            2 - Inserir instituição 
+            3 - Inserir usuario no banco de dados
+            4 - Inserir arquivo associado a um usuario
+            0 - Sair
+            """)
+            op = int(input("Digite sua opção: "))
+            if op == 1:
+                insercaoNoBanco.inserir_planos(conexao)
+            elif op == 2:
+                insercaoNoBanco.inserir_instituicao(conexao)
+            elif op == 3:
+                insercaoNoBanco.inserir_usuario(conexao)
+            elif op == 4:
+                pass
+    else:
+        print("Esse adm não existe no banco de dados")
+
+
 def atualizar(cursor, novoValor, chave, tabela, coluna):
     query = f"""
     UPDATE {tabela} 
@@ -295,6 +323,8 @@ def main():
                 resp = exibeMenu()
                 if resp == 1:
                     exibeMenuUsuario(conexao)
+                elif resp == 2:
+                    pass
                 elif resp == 4:
                     #ajeitar verificacoes a mais
                     email = str(input("Digite seu email: "))
