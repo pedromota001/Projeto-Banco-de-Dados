@@ -14,7 +14,6 @@ BEGIN
 END //
 
 DELIMITER ;
-
      """)
     data_atual = date.today()
     query = "UPDATE atividades_recentes SET ultima_versao = %s"
@@ -31,7 +30,6 @@ verificar_atividades()
 
 def conta_usuario(id_arquivo):
     cursor = conexao.cursor()
-
     try:
         verifica_arquivo_query = '''
         SELECT COUNT(*) 
