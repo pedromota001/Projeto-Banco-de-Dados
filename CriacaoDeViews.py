@@ -32,9 +32,10 @@ def view_historico_usuario(conexao):
         o.tipo_operecao
         FROM operacoes o
         INNER JOIN usuarios u ON o.id_usuario = u.id_usuario
-        WHERE o.id_usuario = @id_usuario_logado
-        GRANT SELECT ON historico_operacoes_usuario TO usuario_logado;                                                                                                                                       
+        WHERE o.id_usuario = @id_usuario_logado;                                                                                                                                      
         """)
+        cursor.execute("GRANT SELECT ON historico_operacoes_usuario TO usuario_logado;")
+        conexao.commit()                   
     except Error as erro:
         print(f"Nao foi possivel criar view: {erro}")
         return None
