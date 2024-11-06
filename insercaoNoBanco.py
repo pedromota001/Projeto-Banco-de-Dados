@@ -139,3 +139,58 @@ def insert_operacoes(conexao):
         print(f"Erro ao inserir operação: {erro}")
     finally:
         cursor.close()
+
+def insert_compartilhamentos(conexao):
+    try:
+        cursor = conexao.cursor()
+        id_usuario_dono = int(input("Digite o ID do usuário dono do arquivo: "))
+        id_usuario_compartilhado = int(input("Digite o ID do usuário com quem o arquivo foi compartilhado: "))
+        id_arquivo = int(input("Digite o ID do arquivo compartilhado: "))
+        data_compartilhado = input("Digite a data de compartilhamento (AAAA-MM-DD): ")
+
+        cursor.execute("""
+        INSERT INTO compartilhamentos(id_usuario_dono, id_usuario_compartilhado, id_arquivo, data_compartilhado) 
+        VALUES (%s, %s, %s, %s);
+        """, (id_usuario_dono, id_usuario_compartilhado, id_arquivo, data_compartilhado))
+
+        print("Compartilhamento inserido com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir compartilhamento: {erro}")
+    finally:
+        cursor.close()
+
+def insert_administradores(conexao):
+    try:
+        cursor = conexao.cursor()
+        email = input("Digite o email do administrador: ")
+        senha = input("Digite a senha do administrador: ")
+        login = input("Digite o login do administrador: ")
+        data_ingresso = input("Digite a data de ingresso (AAAA-MM-DD): ")
+        cursor.execute("""
+        INSERT INTO administradores(email, senha, login, data_ingresso) 
+        VALUES (%s, %s, %s, %s);
+        """, (email, senha, login, data_ingresso))
+        print("Administrador inserido com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir administrador: {erro}")
+    finally:
+        cursor.close()
+
+def insert_suportes(conexao):
+    try:
+        cursor = conexao.cursor()
+        dia = input("Digite a data do suporte (AAAA-MM-DD): ")
+        hora = input("Digite a hora do suporte (HH:MM:SS): ")
+        descricao = input("Digite a descrição do suporte: ")
+        id_adm = int(input("Digite o ID do administrador responsável pelo suporte: "))
+
+        cursor.execute("""
+        INSERT INTO suportes(dia, hora, descricao, id_adm) 
+        VALUES (%s, %s, %s, %s);
+        """, (dia, hora, descricao, id_adm))
+
+        print("Suporte inserido com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir suporte: {erro}")
+    finally:
+        cursor.close()
