@@ -197,6 +197,20 @@ def criar_tabelas(cursor):
         """)
     print("Tabela 'atividades_recentes' criada com sucesso.")
 
+
+def defineUserLogado(conexao, id_usuario):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        set @usuario_id_logado = %s
+        """, (id_usuario,))
+        conexao.commit()
+    except Error as erro:
+        print(f"Erro ao definir usuario logado: {erro}")
+        return None
+    finally:
+        cursor.close()
+
 def exibeMenu():
         print("""
             OPCOES DE LOGIN
@@ -215,6 +229,7 @@ def exibeMenuUsuario(conexao):
     login = str(input("Digite seu login: "))
     senha = str(input("Digite sua senha: "))
     usuario = BuscasNoBanco.buscar_usuario(conexao, login, senha)
+    defineUserLogado(conexao, usuario)
     if usuario:
         op = -1
         print("Bem vindo!!!!")
@@ -250,8 +265,7 @@ def exibeMenuUsuario(conexao):
                 print("Remocao concluida!!!")
                 conexao.commit()
             elif op == 4:
-                CriacaoDeViews.view_arquivo_usuario(conexao,usuario)
-                buscar_arquivos_usuario_view(conexao)
+                print("oi")
 
         #implementar outras opcoes
     else:
@@ -275,6 +289,7 @@ def main():
             cursor = conexao.cursor()
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
+            view_arquivo_usuario(conexao)
             resp = -1
             while (resp != 0):
                 resp = exibeMenu()
