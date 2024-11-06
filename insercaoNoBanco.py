@@ -56,3 +56,85 @@ def insert_instituicoes(conexao):
         print(f"Erro ao inserir instituição: {erro}")
     finally:
         cursor.close()
+
+def insert_usuarios(conexao):
+    try:
+        cursor = conexao.cursor()
+        email = input("Digite o email do usuário: ")
+        senha = input("Digite a senha do usuário: ")
+        login = input("Digite o login do usuário: ")
+        data_ingresso = input("Digite a data de ingresso (AAAA-MM-DD): ")
+        id_instituicao = int(input("Digite o ID da instituição à qual o usuário está atrelado: "))
+
+        cursor.execute("""
+        INSERT INTO usuarios(email, senha, login, data_ingresso, id_instituicao) 
+        VALUES (%s, %s, %s, %s, %s);
+        """, (email, senha, login, data_ingresso, id_instituicao))
+
+        print("Usuário inserido com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir usuário: {erro}")
+    finally:
+        cursor.close()
+
+def insert_comentarios(conexao):
+    try:
+        cursor = conexao.cursor()
+        conteudo = input("Digite o conteúdo do comentário: ")
+        data_comentario = input("Digite a data do comentário (AAAA-MM-DD): ")
+        hora_comentario = input("Digite a hora do comentário (HH:MM:SS): ")
+        id_usuario = int(input("Digite o ID do usuário que está comentando: "))
+        id_arquivo = int(input("Digite o ID do arquivo ao qual o comentário está atrelado: "))
+
+        cursor.execute("""
+        INSERT INTO comentarios(conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo) 
+        VALUES (%s, %s, %s, %s, %s);
+        """, (conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo))
+
+        print("Comentário inserido com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir comentário: {erro}")
+    finally:
+        cursor.close()
+
+def insert_historico_versionamento(conexao):
+    try:
+        cursor = conexao.cursor()
+        data_historico = input("Digite a data do histórico (AAAA-MM-DD): ")
+        hora_historico = input("Digite a hora do histórico (HH:MM:SS): ")
+        operacao_historico = input("Digite a operação realizada (ex: 'edição', 'exclusão'): ")
+        id_usuario_alterou = int(input("Digite o ID do usuário que realizou a alteração: "))
+        conteudo_mudado = input("Digite o conteúdo que foi alterado: ")
+        id_arquivo = int(input("Digite o ID do arquivo ao qual o histórico está atrelado: "))
+
+        cursor.execute("""
+        INSERT INTO historico_versionamento(data_historico, hora_historico, operacao_historico, 
+                                            id_usuario_alterou, conteudo_mudado, id_arquivo) 
+        VALUES (%s, %s, %s, %s, %s, %s);
+        """, (data_historico, hora_historico, operacao_historico, id_usuario_alterou, conteudo_mudado, id_arquivo))
+
+        print("Histórico de versionamento inserido com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir histórico de versionamento: {erro}")
+    finally:
+        cursor.close()
+
+def insert_operacoes(conexao):
+    try:
+        cursor = conexao.cursor()
+        data_op = input("Digite a data da operação (AAAA-MM-DD): ")
+        hora_op = input("Digite a hora da operação (HH:MM:SS): ")
+        tipo_operacao = input("Digite o tipo de operação realizada (ex: 'upload', 'download', 'exclusão'): ")
+        id_usuario = int(input("Digite o ID do usuário que realizou a operação: "))
+        id_arquivo = int(input("Digite o ID do arquivo ao qual a operação está relacionada: "))
+
+        cursor.execute("""
+        INSERT INTO operacoes(data_op, hora_op, tipo_operacao, id_usuario, id_arquivo) 
+        VALUES (%s, %s, %s, %s, %s);
+        """, (data_op, hora_op, tipo_operacao, id_usuario, id_arquivo))
+
+        print("Operação inserida com sucesso!")
+    except Error as erro:
+        print(f"Erro ao inserir operação: {erro}")
+    finally:
+        cursor.close()
