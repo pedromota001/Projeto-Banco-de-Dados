@@ -2,6 +2,9 @@ from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
 
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome
+
+
 def insert_arquivos(conexao, id_usuario):
     try:
         cursor = conexao.cursor()
@@ -140,20 +143,29 @@ def insert_operacoes(conexao):
     finally:
         cursor.close()
 
-def insert_compartilhamentos(conexao):
+def insert_compartilhamentos(conexao, id_usuario_dono):
     try:
         cursor = conexao.cursor()
-        id_usuario_dono = int(input("Digite o ID do usuário dono do arquivo: "))
-        id_usuario_compartilhado = int(input("Digite o ID do usuário com quem o arquivo foi compartilhado: "))
-        id_arquivo = int(input("Digite o ID do arquivo compartilhado: "))
-        data_compartilhado = input("Digite a data de compartilhamento (AAAA-MM-DD): ")
-
-        cursor.execute("""
-        INSERT INTO compartilhamentos(id_usuario_dono, id_usuario_compartilhado, id_arquivo, data_compartilhado) 
-        VALUES (%s, %s, %s, %s);
-        """, (id_usuario_dono, id_usuario_compartilhado, id_arquivo, data_compartilhado))
-
-        print("Compartilhamento inserido com sucesso!")
+        email = str(input("Digita o email do usuario que voce quer compartilhar um arquivo: "))
+        id_usuario_compartilhado = buscar_usuario_email(conexao, email)
+        if id_usuario_compartilhado:
+            arquivos = buscar_arquivos_usuario(conexao, id_usuario_dono)
+            for arquivo in arquivos:
+                print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
+            nomeArquivo = str(input("Digite o nome do arquivo que voce ira compartilhar: "))
+            id_arquivo = buscar_arquivoPor_nome(conexao, nomeArquivo)
+            if id_arquivo:
+                data_compartilhado = datetime.now().date()
+                cursor.execute("""
+                        INSERT INTO compartilhamentos(id_usuario_dono, id_usuario_compartilhado, id_arquivo, data_compartilhado) 
+                        VALUES (%s, %s, %s, %s);
+                        """, (id_usuario_dono, id_usuario_compartilhado, id_arquivo, data_compartilhado))
+                conexao.commit()
+                print("Compartilhamento inserido com sucesso!")
+            else:
+                print("\nErro! Arquivo nao existe no banco de dados.")
+        else:
+            print("\nUsuario nao existe no banco, tente outro email! ")
     except Error as erro:
         print(f"Erro ao inserir compartilhamento: {erro}")
     finally:

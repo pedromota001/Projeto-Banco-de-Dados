@@ -6,7 +6,8 @@ import CriacaoDeRoles
 import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
-from BuscasNoBanco import buscar_arquivos_usuario
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email
+from insercaoNoBanco import insert_compartilhamentos
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
@@ -239,6 +240,7 @@ def exibeMenuUsuario(conexao):
             3 - Deletar arquivo do drive
             4 - Listar arquivos meus e compartilhados
             5 - Compartilhar arquivo com outro usuario(atraves do email)
+            6 - Fazer comentario em arquivo
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
@@ -262,7 +264,12 @@ def exibeMenuUsuario(conexao):
                 print("Remocao concluida!!!")
                 conexao.commit()
             elif op == 4:
-                print("oi")
+                pass
+            elif op == 5:
+                insert_compartilhamentos(conexao,usuario)
+
+
+
 
         #implementar outras opcoes
     else:
@@ -334,12 +341,12 @@ def main():
             print(f"Total de usuarios: {total_usuarios[0]}")
 
             ##chavear_arquivo(conexao)
-            cursor.callproc("chavear_arquivo", [1])
-            conexao.commit()
+            #cursor.callproc("chavear_arquivo", [1])
+            #conexao.commit()
 
             ##remover_acessos(conexao)
-            cursor.callproc("remover_acessos", [2])
-            conexao.commit()
+            #cursor.callproc("remover_acessos", [2])
+            #conexao.commit()
 
             resp = -1
             while (resp != 0):

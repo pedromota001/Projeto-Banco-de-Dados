@@ -57,6 +57,26 @@ def buscar_arquivos_usuario_view(conexao):
 
 
 
+def buscar_usuario_email(conexao, email):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT * FROM usuarios 
+        WHERE email = %s
+        """, (email,))
+        usuario = cursor.fetchone()
+        if usuario:
+            return usuario[0]##retorno id do usuario
+        else:
+            return None
+    except Error as erro:
+        print(f"Nao foi possivel buscar o usuario pelo email: {erro}")
+        return None
+    finally:
+        cursor.close()
+
+
+
 def buscar_adm(conexao, login, senha):
     try:
         cursor = conexao.cursor()
@@ -72,4 +92,25 @@ def buscar_adm(conexao, login, senha):
         print(f"Não foi possivel buscar o administrador: {erro}")
         return None
     finally:
-        cursor.close()  
+        cursor.close()
+
+
+
+
+def buscar_arquivoPor_nome(conexao, nome):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT * FROM arquivos
+        WHERE nome = %s
+        """, (nome,))
+        arquivo = cursor.fetchone()
+        if arquivo:
+            return arquivo[0]
+        else:
+            return None
+    except Error as erro:
+        print(f"Nao foi possivel buscar o arquivo pelo nome: {erro}")
+        return None
+    finally:
+        cursor.close()
