@@ -1,7 +1,7 @@
 import mysql.conncetor
 from datetime import date
 
-def verificar_atividades():
+def verificar_atividades(conexao):
     cursor = conexao.cursor()
     cursor.execute("""
     DELIMITER //
@@ -16,7 +16,7 @@ END //
 DELIMITER ;
 
      """)
-    data_atual = date.today()
+    data_atual = date.today()   
     query = "UPDATE atividades_recentes SET ultima_versao = %s"
     cursor.execute(query, (data_atual,))
     if cursor.rowcount > 0:
@@ -27,9 +27,9 @@ DELIMITER ;
         print('Nenhuma linha foi atualizada com sucesso!')
     cursor.close()
     conexao.close()
-verificar_atividades()
 
-def conta_usuario(id_arquivo):
+#falta consertar algumas coisas
+def conta_usuario(conexao, id_arquivo):
     cursor = conexao.cursor()
 
     try:
@@ -55,7 +55,7 @@ def chavear_arquivo(conexao, id_arquivo):
 
     try:
         cursor.execute("""
-            CREATE PROCEDURE chavear_arquivo(IN p_id_arquivo INT)
+            CREATE PROCEDURE chavear_(IN p_id_arquivo INT)
             BEGIN
                 IF EXISTS (
                     SELECT 1
@@ -75,11 +75,43 @@ def chavear_arquivo(conexao, id_arquivo):
                 END IF;
             END;
         """)
-
+        conexao.commit()
         print("Procedimento 'chavear_usuario' criado com sucesso.")
-
+        
     except Error as erro:
         print(f"Erro ao criar procedimento: {erro}")
     finally:
         cursor.close()
 
+def remover_acessos(conexao, id_arquivo):
+    cursor = conexao.cursor()
+
+    try:
+        cursor.execute("""
+
+            CREATE PROCEDURE remover_acessos(IN r_id_arquivo INT)
+            BEGIN
+                DECLARE v_id_usuario_dono INT;
+               IF EXISTS (
+                    SELECT 1
+                    FROM arquivos
+                    WHERE id_arquivo = r_id_arquivo
+               ) THEN
+                    SELECT id_usuario_dono INTO v_id_usuario_dono
+                    FROM compartilhamentos
+                    WHERE id_arquivo = r_id_arquivo;   
+
+                    UPDATE arquivos
+                    SET permissao = false
+                    WHERE id_arquivo = r_id_arquivo
+                    AND id_usuario != v_id_usuario_dono;
+                END IF;
+            END;                  
+        """)
+
+        print("Procedimento 'remover_acessos' criado com sucesso.")
+        conexao.commit()
+    except Exception as error:
+        print(f"Erro ao remover acessos: {error}")
+    finally:
+        cursor.close()    
