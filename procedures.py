@@ -95,3 +95,35 @@ def chavear_arquivo(conexao, id_arquivo):
     finally:
         cursor.close()
 
+def remover_acessos(conexao, id_arquivo):
+    cursor = conexao.cursor()
+
+    try:
+        cursor.execute("""
+
+            CREATE PROCEDURE remover_acessos(IN r_id_arquivo INT)
+            BEGIN
+                DECLARE v_id_usuario_dono INT;
+               IF EXISTS (
+                    SELECT 1
+                    FROM arquivos
+                    WHERE id_arquivo = r_id_arquivo
+               ) THEN
+                    SELECT id_usuario_dono INTO v_id_usuario_dono
+                    FROM compartilhamentos
+                    WHERE id_arquivo = r_id_arquivo;   
+
+                    UPDATE arquivos
+                    SET permissao = false
+                    WHERE id_arquivo = r_id_arquivo
+                    AND id_usuario != v_id_usuario_dono;
+                END IF;
+            END;                  
+        """)
+
+        print("Procedimento 'remover_acessos' criado com sucesso.")
+        conexao.commit()
+    except Exception as error:
+        print(f"Erro ao remover acessos: {error}")
+    finally:
+        cursor.close()    
