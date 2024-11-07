@@ -1,4 +1,4 @@
-import mysql.conncetor
+import mysql.connector
 from datetime import date
 
 def verificar_atividades(conexao):
@@ -59,7 +59,7 @@ def conta_usuario(conexao, id_arquivo):
 id_arquivo = 1
 print(f"Usuarios  distintos  com acesso ao arquivo {id_arquivo}: {conta_usuario(id_arquivo)}")
 
-def chavear_arquivo(conexao, id_arquivo):
+def chavear_arquivo(conexao):
     cursor = conexao.cursor()
 
     try:
@@ -105,7 +105,7 @@ def chavear_arquivo(conexao, id_arquivo):
     finally:
         cursor.close()
 
-def remover_acessos(conexao, id_arquivo):
+def remover_acessos(conexao):
     cursor = conexao.cursor()
 
     try:
