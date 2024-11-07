@@ -50,26 +50,40 @@ def chavear_arquivo(conexao):
 
     try:
         cursor.execute("""
-            CREATE PROCEDURE chavear_arquivo(IN p_id_arquivo INT)
-            BEGIN
-                IF EXISTS (
-                    SELECT 1
-                    FROM arquivos
-                    WHERE id_arquivo = p_id_arquivo
-                ) AND EXISTS (
-                    SELECT 1
-                    FROM atividades_recentes
-                    WHERE id_arquivo = p_id_arquivo AND acesso = 'p'
-                ) THEN
-                    UPDATE atividades_recentes
-                    SET acesso = 'np'
-                    WHERE id_arquivo = p_id_arquivo;
-                ELSE
-                    SIGNAL SQLSTATE '45000'
-                    SET MESSAGE_TEXT = 'O arquivo não existe ou não está marcado como prioritário.';
-                END IF;
-            END;
-        """)
+    CREATE PROCEDURE chavear_arquivo(IN p_id_arquivo INT)
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM arquivos
+            WHERE id_arquivo = p_id_arquivo
+        ) THEN
+            IF EXISTS (
+                SELECT 1
+                FROM atividades_recentes
+                WHERE id_arquivo = p_id_arquivo AND acesso = 'p'
+            ) THEN
+                UPDATE atividades_recentes
+                SET acesso = 'np'
+                WHERE id_arquivo = p_id_arquivo;
+            ELSEIF EXISTS (
+                SELECT 1
+                FROM atividades_recentes
+                WHERE id_arquivo = p_id_arquivo AND acesso = 'np'
+            ) THEN
+                UPDATE atividades_recentes
+                SET acesso = 'p'
+                WHERE id_arquivo = p_id_arquivo;
+            ELSE
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'O arquivo não existe ou não está marcado como prioritário ou não prioritário.';
+            END IF;
+        ELSE
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'O arquivo não existe na tabela arquivos.';
+        END IF;
+    END;
+""")
+
         conexao.commit()
         print("Procedimento 'chavear_usuario' criado com sucesso.")
 
@@ -95,8 +109,8 @@ def remover_acessos(conexao):
                     FROM compartilhamentos
                     WHERE id_arquivo = r_id_arquivo;   
 
-                    UPDATE arquivos
-                    SET permissao = false
+                    UPDATE compartilhamentos
+                    SET id_usuario_compartilhado = NULL
                     WHERE id_arquivo = r_id_arquivo
                     AND id_usuario != v_id_usuario_dono;
                 END IF;
