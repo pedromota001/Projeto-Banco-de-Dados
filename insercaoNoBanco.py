@@ -48,14 +48,16 @@ def insert_instituicoes(conexao):
         nome = input("Digite o nome da instituição: ")
         endereco = input("Digite o endereço da instituição: ")
         causa_social = input("Digite a causa social da instituição: ")
-        id_plano = int(input("Digite o ID do plano ao qual a instituição está atrelada: "))
+        nome_plano = input("Digite o nome do plano associado à instituição: ")
 
-        cursor.execute("""
-        INSERT INTO instituicoes(nome, endereco, causa_social, id_plano) 
-        VALUES (%s, %s, %s, %s);
-        """, (nome, endereco, causa_social, id_plano))
-
-        print("Instituição inserida com sucesso!")
+        id_plano = buscar_plano_por_nome(conexao, nome_plano)
+        if id_plano:
+            cursor.execute("INSERT INTO instituicoes(nome, endereco, causa_social, id_plano) VALUES (%s, %s, %s, %s);", 
+                           (nome, endereco, causa_social, id_plano))
+            conexao.commit()
+            print("Instituição inserida com sucesso!")
+        else:
+            print("Plano não encontrado. Verifique o nome e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir instituição: {erro}")
     finally:
