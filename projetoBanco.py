@@ -1,19 +1,13 @@
-from datetime import datetime
-from traceback import print_tb
-
 import mysql.connector
 from mysql.connector import Error
 
 import BuscasNoBanco
+import CriacaoDeRoles
 import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
-import CriacaoDeRoles
-from BuscasNoBanco import buscar_arquivos_usuario, buscar_arquivos_usuario_view
-from CriacaoDeViews import view_arquivo_usuario
-from insercaoNoBanco import insert_arquivos
-from CriacaoDeRoles import cria_role_PapelAdm
-
+from BuscasNoBanco import buscar_arquivos_usuario
+from procedures import verificar_atividades, conta_usuario
 
 
 def criar_conexao():
@@ -326,7 +320,17 @@ def main():
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
             CriacaoDeViews.view_administradores(conexao)
-            CriacaoDeRoles.cria_role_PapelAdm(conexao)
+            ##CriacaoDeRoles.cria_role_PapelAdm(conexao)
+            ##verificar_atividades(conexao)
+            cursor.callproc("verificar_atividades")
+            conexao.commit()
+            for result in cursor.stored_results():
+                print(result.fetchall())
+            ##conta_usuario(conexao)
+            total_usuarios = 0
+            total_usuarios = cursor.callproc("ContaUsuarios", [2,total_usuarios])
+            print(f"Total de usuarios: {total_usuarios[0]}")
+
             resp = -1
             while (resp != 0):
                 resp = exibeMenu()

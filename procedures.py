@@ -1,63 +1,48 @@
-import mysql.conncetor
-from datetime import date
+import mysql.connector
+from mysql.connector import Error
+
+import mysql.connector
+
 
 def verificar_atividades(conexao):
-    cursor = conexao.cursor()
-    cursor.execute("""
-    
-
-CREATE PROCEDURE verificar_atividades()
-BEGIN
-    SET @data_atual = CURDATE();
-    UPDATE atividades_recentes SET ultima_versao = @data_atual;
-    SELECT CONCAT(ROW_COUNT(), ' linhas foram atualizadas com a data atual.') AS mensagem_sucesso;
-END; 
-
-     """)
-    data_atual = date.today()
-    query = "UPDATE atividades_recentes SET ultima_versao = %s"
-    cursor.execute(query, (data_atual,))
-    if cursor.rowcount > 0:
-        conexao.commit()
-        print('Tabela Atividades atualizadas com sucesso!')
-    else:
-        conexao.rollback()
-        print('Nenhuma linha foi atualizada com sucesso!')
-    cursor.close()
-    conexao.close()
-
-def conta_usuario(conexao, id_arquivo):
-    cursor = conexao.cursor()
-    cursor.execute("""
-       
-    CREATE PROCEDURE ContaUsuarios(IN arquivo_id INT, OUT total_usuarios INT)
-    BEGIN
-        SELECT COUNT(DISTINCT id_usuario) INTO total_usuarios
-        FROM arquivos
-        WHERE id_arquivo = arquivo_id;
-        IF total_usuarios IS NULL THEN
-            SET total_usuarios = 0;
-        END IF;
-    END; 
-    
-        """)
     try:
-        verifica_arquivo_query = '''
-        SELECT COUNT(*) 
-        FROM arquivos
-        WHERE id_arquivo = %s;
-        '''
-        cursor.execute(verifica_arquivo_query, (id_arquivo,))
-        resultado = cursor.fetchone()
-        return resultado[0] if resultado else 0
-    except mysql.connector.Error as erro:
-        print("Erro ao acessar o banco de dados", erro)
+        cursor = conexao.cursor()
+        query = """
+        CREATE PROCEDURE verificar_atividades()
+        BEGIN
+            UPDATE atividades_recentes SET ultima_versao = CURDATE();
+            SELECT CONCAT(ROW_COUNT(), ' linhas foram atualizadas com a data atual.') AS mensagem_sucesso;
+        END;
+        """
+        cursor.execute(query)
+        conexao.commit()
+        print("Procedure criada com sucesso!")
+    except mysql.connector.Error as err:
+        print(f"Erro ao criar a procedure: {err}")
+    finally:
+        cursor.close()
+
+def conta_usuario(conexao):
+
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""   
+        CREATE PROCEDURE ContaUsuarios(IN arquivo_id INT, OUT total_usuarios INT)
+        BEGIN
+            SELECT COUNT(DISTINCT id_usuario) + COUNT(DISTINCT id_usuario_compartilhado) INTO total_usuarios
+            FROM arquivos a 
+            INNER JOIN compartilhamentos c ON c.id_arquivo = a.id_arquivo
+            WHERE a.id_arquivo = arquivo_id;
+            IF total_usuarios IS NULL THEN
+                SET total_usuarios = 0;
+            END IF;
+        END; 
+        """)
+    except Error as erro:
+        print(f"Erro ao criar procedure de contagem de usuarios: {erro}")
         return None
     finally:
         cursor.close()
-        conexao.close()
-id_arquivo = 1
-print(f"Usuarios  distintos  com acesso ao arquivo {id_arquivo}: {conta_usuario(id_arquivo)}")
 
 def chavear_arquivo(conexao, id_arquivo):
     cursor = conexao.cursor()
