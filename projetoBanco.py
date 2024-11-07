@@ -7,7 +7,7 @@ import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario
-from procedures import verificar_atividades, conta_usuario
+from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
 def criar_conexao():
@@ -321,15 +321,25 @@ def main():
             criar_tabelas(cursor)
             CriacaoDeViews.view_administradores(conexao)
             ##CriacaoDeRoles.cria_role_PapelAdm(conexao)
+
             ##verificar_atividades(conexao)
             cursor.callproc("verificar_atividades")
             conexao.commit()
             for result in cursor.stored_results():
                 print(result.fetchall())
+
             ##conta_usuario(conexao)
             total_usuarios = 0
             total_usuarios = cursor.callproc("ContaUsuarios", [2,total_usuarios])
             print(f"Total de usuarios: {total_usuarios[0]}")
+
+            ##chavear_arquivo(conexao)
+            cursor.callproc("chavear_arquivo", [1])
+            conexao.commit()
+
+            ##remover_acessos(conexao)
+            cursor.callproc("remover_acessos", [2])
+            conexao.commit()
 
             resp = -1
             while (resp != 0):

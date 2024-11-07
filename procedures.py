@@ -38,13 +38,14 @@ def conta_usuario(conexao):
             END IF;
         END; 
         """)
+        conexao.commit()
     except Error as erro:
         print(f"Erro ao criar procedure de contagem de usuarios: {erro}")
         return None
     finally:
         cursor.close()
 
-def chavear_arquivo(conexao, id_arquivo):
+def chavear_arquivo(conexao):
     cursor = conexao.cursor()
 
     try:
@@ -69,7 +70,7 @@ def chavear_arquivo(conexao, id_arquivo):
                 END IF;
             END;
         """)
-
+        conexao.commit()
         print("Procedimento 'chavear_usuario' criado com sucesso.")
 
     except Error as erro:
@@ -77,10 +78,9 @@ def chavear_arquivo(conexao, id_arquivo):
     finally:
         cursor.close()
 
-def remover_acessos(conexao, id_arquivo):
-    cursor = conexao.cursor()
-
+def remover_acessos(conexao):
     try:
+        cursor = conexao.cursor()
         cursor.execute("""
 
             CREATE PROCEDURE remover_acessos(IN r_id_arquivo INT)
@@ -102,9 +102,8 @@ def remover_acessos(conexao, id_arquivo):
                 END IF;
             END;                  
         """)
-
-        print("Procedimento 'remover_acessos' criado com sucesso.")
         conexao.commit()
+        print("Procedimento 'remover_acessos' criado com sucesso.")
     except Exception as error:
         print(f"Erro ao remover acessos: {error}")
     finally:
