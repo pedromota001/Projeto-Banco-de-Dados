@@ -6,14 +6,14 @@ def verificar_atividades(conexao):
     cursor.execute("""
     DELIMITER //
 
-CREATE PROCEDURE verificar_atividades()
-BEGIN
+    CREATE PROCEDURE verificar_atividades()
+    BEGIN
     SET @data_atual = CURDATE();
     UPDATE atividades_recentes SET ultima_versao = @data_atual;
     SELECT CONCAT(ROW_COUNT(), ' linhas foram atualizadas com a data atual.') AS mensagem_sucesso;
-END //
+    END //
 
-DELIMITER ;
+    DELIMITER ;
 
      """)
     data_atual = date.today()   
