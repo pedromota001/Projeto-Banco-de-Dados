@@ -50,5 +50,36 @@ def conta_usuario(id_arquivo):
 id_arquivo = 1
 print(f"Usuarios  distintos  com acesso ao arquivo {id_arquivo}: {conta_usuario(id_arquivo)}")
 
+def chavear_arquivo(conexao, id_arquivo):
+    cursor = conexao.cursor()
 
+    try:
+        cursor.execute("""
+            CREATE PROCEDURE chavear_arquivo(IN p_id_arquivo INT)
+            BEGIN
+                IF EXISTS (
+                    SELECT 1
+                    FROM arquivos
+                    WHERE id_arquivo = p_id_arquivo
+                ) AND EXISTS (
+                    SELECT 1
+                    FROM atividades_recentes
+                    WHERE id_arquivo = p_id_arquivo AND acesso = 'p'
+                ) THEN
+                    UPDATE atividades_recentes
+                    SET acesso = 'np'
+                    WHERE id_arquivo = p_id_arquivo;
+                ELSE
+                    SIGNAL SQLSTATE '45000'
+                    SET MESSAGE_TEXT = 'O arquivo não existe ou não está marcado como prioritário.';
+                END IF;
+            END;
+        """)
+
+        print("Procedimento 'chavear_usuario' criado com sucesso.")
+
+    except Error as erro:
+        print(f"Erro ao criar procedimento: {erro}")
+    finally:
+        cursor.close()
 
