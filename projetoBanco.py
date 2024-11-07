@@ -233,7 +233,7 @@ def exibeMenuUsuario(conexao):
     usuario = BuscasNoBanco.buscar_usuario(conexao, login, senha)
     if usuario:
         defineUserLogado(conexao, usuario)
-        view_arquivo_usuario(conexao)
+        ##view_arquivo_usuario(conexao)
         op = -1
         print("Bem vindo!!!!")
         while op != 0:
