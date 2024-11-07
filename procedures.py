@@ -1,4 +1,5 @@
 import mysql.connector
+from mysql.connector import Error
 from datetime import date
 
 def verificar_atividades(conexao):
