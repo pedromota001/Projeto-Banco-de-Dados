@@ -144,3 +144,15 @@ def buscar_plano_por_nome(conexao, nome_plano):
         return None
     finally:
         cursor.close()
+
+def buscar_adm_por_email(conexao, email):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT id_adm FROM administradores WHERE email = %s", (email,))
+        administrador = cursor.fetchone()
+        return administrador[0] if administrador else None
+    except Error as erro:
+        print(f"Erro ao buscar administrador: {erro}")
+        return None
+    finally:
+        cursor.close()
