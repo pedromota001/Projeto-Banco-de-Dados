@@ -1,19 +1,17 @@
 import mysql.conncetor
 from datetime import date
 
-def verificar_atividades():
+def verificar_atividades(conexao):
     cursor = conexao.cursor()
     cursor.execute("""
-    DELIMITER //
+    
 
 CREATE PROCEDURE verificar_atividades()
 BEGIN
     SET @data_atual = CURDATE();
     UPDATE atividades_recentes SET ultima_versao = @data_atual;
     SELECT CONCAT(ROW_COUNT(), ' linhas foram atualizadas com a data atual.') AS mensagem_sucesso;
-END //
-
-DELIMITER ;
+END; 
 
      """)
     data_atual = date.today()
@@ -27,12 +25,11 @@ DELIMITER ;
         print('Nenhuma linha foi atualizada com sucesso!')
     cursor.close()
     conexao.close()
-verificar_atividades()
 
-def conta_usuario(id_arquivo):
+def conta_usuario(conexao, id_arquivo):
     cursor = conexao.cursor()
     cursor.execute("""
-        DELIMITER //
+       
     CREATE PROCEDURE ContaUsuarios(IN arquivo_id INT, OUT total_usuarios INT)
     BEGIN
         SELECT COUNT(DISTINCT id_usuario) INTO total_usuarios
@@ -41,8 +38,8 @@ def conta_usuario(id_arquivo):
         IF total_usuarios IS NULL THEN
             SET total_usuarios = 0;
         END IF;
-    END //
-    DELIMITER ;
+    END; 
+    
         """)
     try:
         verifica_arquivo_query = '''
@@ -52,7 +49,7 @@ def conta_usuario(id_arquivo):
         '''
         cursor.execute(verifica_arquivo_query, (id_arquivo,))
         resultado = cursor.fetchone()
-        return result[0] if resul else 0
+        return resultado[0] if resultado else 0
     except mysql.connector.Error as erro:
         print("Erro ao acessar o banco de dados", erro)
         return None
