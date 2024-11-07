@@ -338,7 +338,7 @@ def main():
             ##conta_usuario(conexao)
             total_usuarios = 0
             total_usuarios = cursor.callproc("ContaUsuarios", [2,total_usuarios])
-            print(f"Total de usuarios: {total_usuarios[0]}")
+            print(f"Total de usuarios: {total_usuarios[1]}")
 
             ##chavear_arquivo(conexao)
             #cursor.callproc("chavear_arquivo", [1])
