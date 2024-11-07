@@ -31,7 +31,19 @@ verificar_atividades()
 
 def conta_usuario(id_arquivo):
     cursor = conexao.cursor()
-
+    cursor.execute("""
+        DELIMITER //
+    CREATE PROCEDURE ContaUsuarios(IN arquivo_id INT, OUT total_usuarios INT)
+    BEGIN
+        SELECT COUNT(DISTINCT id_usuario) INTO total_usuarios
+        FROM arquivos
+        WHERE id_arquivo = arquivo_id;
+        IF total_usuarios IS NULL THEN
+            SET total_usuarios = 0;
+        END IF;
+    END //
+    DELIMITER ;
+        """)
     try:
         verifica_arquivo_query = '''
         SELECT COUNT(*) 
