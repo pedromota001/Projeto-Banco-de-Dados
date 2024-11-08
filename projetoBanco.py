@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import mysql.connector
 from mysql.connector import Error
 
@@ -6,8 +8,9 @@ import CriacaoDeRoles
 import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
-from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email
-from insercaoNoBanco import insert_compartilhamentos
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome
+from RemocaoNoBanco import remove_arquivo_por_id
+from insercaoNoBanco import insert_compartilhamentos, insert_operacoes
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
@@ -123,10 +126,8 @@ def criar_tabelas(cursor):
             data_op DATE,
             hora_op TIME,
             tipo_operacao VARCHAR(15),
-            id_arquivo INT,
             id_usuario INT,
             PRIMARY KEY(id_operacoes),
-            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo),
             FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
         ); 
     """)
@@ -241,6 +242,7 @@ def exibeMenuUsuario(conexao):
             4 - Listar arquivos meus e compartilhados
             5 - Compartilhar arquivo com outro usuario(atraves do email)
             6 - Fazer comentario em arquivo
+            7 - Fazer operacoes em arquivos
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
@@ -267,6 +269,38 @@ def exibeMenuUsuario(conexao):
                 pass
             elif op == 5:
                 insert_compartilhamentos(conexao,usuario)
+            elif op == 6:
+                pass
+            elif op == 7:
+                print("Seus arquivos: ")
+                arquivos = buscar_arquivos_usuario(conexao, usuario)
+                for arquivo in arquivos:
+                    print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
+                arquivo = str(input("Digite o nome do arquivo que voce deseja operar: "))
+                id_arquivo_achado = buscar_arquivoPor_nome(conexao, arquivo)
+                if id_arquivo_achado:
+                    print("""\n
+                    1 - Carregar
+                    2 - Remover 
+                    3 - Atualizar nome do arquivo
+                    \n
+                    """)
+                    tipo_operacao = int(input("Especifique o tipo de operacao que voce deseja fazer: "))
+                    if tipo_operacao == 1:
+                        operacao = "carregar"
+                        pass
+                    elif tipo_operacao == 2:
+                        operacao = "remover"
+                        date_op = datetime.now().date()
+                        hora_op = datetime.now().time()
+                        insert_operacoes(conexao, date_op, hora_op, operacao, usuario)
+                        remove_arquivo_por_id(conexao, id_arquivo_achado)
+                    else:
+                        operacao = "atualizar"
+                        ##implementar
+
+
+
 
 
 

@@ -142,27 +142,15 @@ def insert_historico_versionamento(conexao):
         cursor.close()
 
 
-def insert_operacoes(conexao):
+def insert_operacoes(conexao, data_op, hora_op, tipo_operacao, id_usuario):
     try:
         cursor = conexao.cursor()
-        tipo_operacao = input("Digite o tipo de operação: ")
-        email_usuario = input("Digite o email do usuário que realizou a operação: ")
-        nome_arquivo = input("Digite o nome do arquivo ao qual a operação está atrelada: ")
-
-        id_usuario = buscar_usuario_por_email(conexao, email_usuario)
-        id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
-
-        if id_usuario and id_arquivo:
-            data_op = datetime.now()
-            hora_op = datetime.now().hour
-            cursor.execute("""
-            INSERT INTO operacoes(data_op, hora_op, tipo_operacao, descricao, id_usuario, id_arquivo) 
-            VALUES (%s, %s, %s, %s, %s, %s);
-            """, (data_op, hora_op, descricao, id_usuario, id_arquivo))
-            conexao.commit()
-            print("Operação inserida com sucesso!")
-        else:
-            print("Usuário ou arquivo não encontrado. Verifique e tente novamente.")
+        cursor.execute("""
+        INSERT INTO operacoes(data_op, hora_op, tipo_operacao, id_usuario) 
+        VALUES (%s, %s, %s, %s);
+        """, (data_op, hora_op,tipo_operacao, id_usuario))
+        conexao.commit()
+        print("Operação inserida com sucesso!")
     except Error as erro:
         print(f"Erro ao inserir operação: {erro}")
     finally:
