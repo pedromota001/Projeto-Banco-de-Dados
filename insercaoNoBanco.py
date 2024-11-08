@@ -2,7 +2,7 @@ from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
 
-from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, buscar_adm_por_email
 
 
 def insert_arquivos(conexao, id_usuario):
@@ -48,18 +48,21 @@ def insert_instituicoes(conexao):
         nome = input("Digite o nome da instituição: ")
         endereco = input("Digite o endereço da instituição: ")
         causa_social = input("Digite a causa social da instituição: ")
-        id_plano = int(input("Digite o ID do plano ao qual a instituição está atrelada: "))
+        nome_plano = input("Digite o nome do plano associado à instituição: ")
 
-        cursor.execute("""
-        INSERT INTO instituicoes(nome, endereco, causa_social, id_plano) 
-        VALUES (%s, %s, %s, %s);
-        """, (nome, endereco, causa_social, id_plano))
-
-        print("Instituição inserida com sucesso!")
+        id_plano = buscar_plano_por_nome(conexao, nome_plano)
+        if id_plano:
+            cursor.execute("INSERT INTO instituicoes(nome, endereco, causa_social, id_plano) VALUES (%s, %s, %s, %s);", 
+                           (nome, endereco, causa_social, id_plano))
+            conexao.commit()
+            print("Instituição inserida com sucesso!")
+        else:
+            print("Plano não encontrado. Verifique o nome e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir instituição: {erro}")
     finally:
         cursor.close()
+
 
 def insert_usuarios(conexao):
     try:
@@ -68,18 +71,22 @@ def insert_usuarios(conexao):
         senha = input("Digite a senha do usuário: ")
         login = input("Digite o login do usuário: ")
         data_ingresso = input("Digite a data de ingresso (AAAA-MM-DD): ")
-        id_instituicao = int(input("Digite o ID da instituição à qual o usuário está atrelado: "))
+        nome_instituicao = input("Digite o nome da instituição do usuário: ")
 
-        cursor.execute("""
-        INSERT INTO usuarios(email, senha, login, data_ingresso, id_instituicao) 
-        VALUES (%s, %s, %s, %s, %s);
-        """, (email, senha, login, data_ingresso, id_instituicao))
-
-        print("Usuário inserido com sucesso!")
+        id_instituicao = buscar_instituicao_por_nome(conexao, nome_instituicao)
+        if id_instituicao:
+            cursor.execute(
+                "INSERT INTO usuarios(email, senha, login, data_ingresso, id_instituicao) VALUES (%s, %s, %s, %s, %s);",
+                (email, senha, login, data_ingresso, id_instituicao))
+            conexao.commit()
+            print("Usuário inserido com sucesso!")
+        else:
+            print("Instituição não encontrada. Verifique o nome e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir usuário: {erro}")
     finally:
         cursor.close()
+
 
 def insert_comentarios(conexao):
     try:
@@ -87,61 +94,80 @@ def insert_comentarios(conexao):
         conteudo = input("Digite o conteúdo do comentário: ")
         data_comentario = input("Digite a data do comentário (AAAA-MM-DD): ")
         hora_comentario = input("Digite a hora do comentário (HH:MM:SS): ")
-        id_usuario = int(input("Digite o ID do usuário que está comentando: "))
-        id_arquivo = int(input("Digite o ID do arquivo ao qual o comentário está atrelado: "))
+        email_usuario = input("Digite o email do usuário que fez o comentário: ")
+        nome_arquivo = input("Digite o nome do arquivo comentado: ")
 
-        cursor.execute("""
-        INSERT INTO comentarios(conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo) 
-        VALUES (%s, %s, %s, %s, %s);
-        """, (conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo))
+        id_usuario = buscar_usuario_por_email(conexao, email_usuario)
+        id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
 
-        print("Comentário inserido com sucesso!")
+        if id_usuario and id_arquivo:
+            cursor.execute(
+                "INSERT INTO comentarios(conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo) VALUES (%s, %s, %s, %s, %s);",
+                (conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo))
+            conexao.commit()
+            print("Comentário inserido com sucesso!")
+        else:
+            print("Usuário ou arquivo não encontrado. Verifique e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir comentário: {erro}")
     finally:
         cursor.close()
+
 
 def insert_historico_versionamento(conexao):
     try:
         cursor = conexao.cursor()
         data_historico = input("Digite a data do histórico (AAAA-MM-DD): ")
         hora_historico = input("Digite a hora do histórico (HH:MM:SS): ")
-        operacao_historico = input("Digite a operação realizada (ex: 'edição', 'exclusão'): ")
-        id_usuario_alterou = int(input("Digite o ID do usuário que realizou a alteração: "))
-        conteudo_mudado = input("Digite o conteúdo que foi alterado: ")
-        id_arquivo = int(input("Digite o ID do arquivo ao qual o histórico está atrelado: "))
+        operacao_historico = input("Digite a operação realizada: ")
+        email_usuario = input("Digite o email do usuário que realizou a alteração: ")
+        nome_arquivo = input("Digite o nome do arquivo ao qual o histórico está atrelado: ")
 
-        cursor.execute("""
-        INSERT INTO historico_versionamento(data_historico, hora_historico, operacao_historico, 
-                                            id_usuario_alterou, conteudo_mudado, id_arquivo) 
-        VALUES (%s, %s, %s, %s, %s, %s);
-        """, (data_historico, hora_historico, operacao_historico, id_usuario_alterou, conteudo_mudado, id_arquivo))
+        id_usuario = buscar_usuario_por_email(conexao, email_usuario)
+        id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
 
-        print("Histórico de versionamento inserido com sucesso!")
+        if id_usuario and id_arquivo:
+            cursor.execute("""
+            INSERT INTO historico_versionamento(data_historico, hora_historico, operacao_historico, 
+                                                id_usuario_alterou, id_arquivo) 
+            VALUES (%s, %s, %s, %s, %s);
+            """, (data_historico, hora_historico, operacao_historico, id_usuario, id_arquivo))
+            conexao.commit()
+            print("Histórico de versionamento inserido com sucesso!")
+        else:
+            print("Usuário ou arquivo não encontrado. Verifique e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir histórico de versionamento: {erro}")
     finally:
         cursor.close()
 
+
 def insert_operacoes(conexao):
     try:
         cursor = conexao.cursor()
-        data_op = input("Digite a data da operação (AAAA-MM-DD): ")
-        hora_op = input("Digite a hora da operação (HH:MM:SS): ")
-        tipo_operacao = input("Digite o tipo de operação realizada (ex: 'upload', 'download', 'exclusão'): ")
-        id_usuario = int(input("Digite o ID do usuário que realizou a operação: "))
-        id_arquivo = int(input("Digite o ID do arquivo ao qual a operação está relacionada: "))
+        tipo_operacao = input("Digite o tipo de operação: ")
+        email_usuario = input("Digite o email do usuário que realizou a operação: ")
+        nome_arquivo = input("Digite o nome do arquivo ao qual a operação está atrelada: ")
 
-        cursor.execute("""
-        INSERT INTO operacoes(data_op, hora_op, tipo_operacao, id_usuario, id_arquivo) 
-        VALUES (%s, %s, %s, %s, %s);
-        """, (data_op, hora_op, tipo_operacao, id_usuario, id_arquivo))
+        id_usuario = buscar_usuario_por_email(conexao, email_usuario)
+        id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
 
-        print("Operação inserida com sucesso!")
+        if id_usuario and id_arquivo:
+            data_op = datetime.now()
+            hora_op = datetime.now().hour
+            cursor.execute("""
+            INSERT INTO operacoes(data_op, hora_op, tipo_operacao, descricao, id_usuario, id_arquivo) 
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """, (data_op, hora_op, descricao, id_usuario, id_arquivo))
+            conexao.commit()
+            print("Operação inserida com sucesso!")
+        else:
+            print("Usuário ou arquivo não encontrado. Verifique e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir operação: {erro}")
     finally:
         cursor.close()
+
 
 def insert_compartilhamentos(conexao, id_usuario_dono):
     try:
@@ -171,22 +197,22 @@ def insert_compartilhamentos(conexao, id_usuario_dono):
     finally:
         cursor.close()
 
+
 def insert_administradores(conexao):
     try:
         cursor = conexao.cursor()
+        login = input("Digite o login do administrador: ")
         email = input("Digite o email do administrador: ")
         senha = input("Digite a senha do administrador: ")
-        login = input("Digite o login do administrador: ")
-        data_ingresso = input("Digite a data de ingresso (AAAA-MM-DD): ")
-        cursor.execute("""
-        INSERT INTO administradores(email, senha, login, data_ingresso) 
-        VALUES (%s, %s, %s, %s);
-        """, (email, senha, login, data_ingresso))
+
+        cursor.execute("INSERT INTO administradores(login, email, senha) VALUES (%s, %s, %s);", (login, email, senha))
+        conexao.commit()
         print("Administrador inserido com sucesso!")
     except Error as erro:
         print(f"Erro ao inserir administrador: {erro}")
     finally:
         cursor.close()
+
 
 def insert_suportes(conexao):
     try:
@@ -194,15 +220,19 @@ def insert_suportes(conexao):
         dia = input("Digite a data do suporte (AAAA-MM-DD): ")
         hora = input("Digite a hora do suporte (HH:MM:SS): ")
         descricao = input("Digite a descrição do suporte: ")
-        id_adm = int(input("Digite o ID do administrador responsável pelo suporte: "))
+        email_adm = input("Digite o email do administrador responsável pelo suporte: ")
 
-        cursor.execute("""
-        INSERT INTO suportes(dia, hora, descricao, id_adm) 
-        VALUES (%s, %s, %s, %s);
-        """, (dia, hora, descricao, id_adm))
+        id_adm = buscar_adm_por_email(conexao, email_adm)
 
-        print("Suporte inserido com sucesso!")
+        if id_adm:
+            cursor.execute("INSERT INTO suportes(dia, hora, descricao, id_adm) VALUES (%s, %s, %s, %s);",
+                           (dia, hora, descricao, id_adm))
+            conexao.commit()
+            print("Suporte inserido com sucesso!")
+        else:
+            print("Administrador não encontrado. Verifique o email e tente novamente.")
     except Error as erro:
         print(f"Erro ao inserir suporte: {erro}")
     finally:
         cursor.close()
+

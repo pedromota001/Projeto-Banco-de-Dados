@@ -114,3 +114,45 @@ def buscar_arquivoPor_nome(conexao, nome):
         return None
     finally:
         cursor.close()
+
+def buscar_instituicao_por_nome(conexao, nome_instituicao):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT id_instituicao FROM instituicoes 
+        WHERE nome = %s
+        """, (nome_instituicao,))
+        instituicao = cursor.fetchone()
+        return instituicao[0] if instituicao else None
+    except Error as erro:
+        print(f"Erro ao buscar instituição: {erro}")
+        return None
+    finally:
+        cursor.close()
+
+def buscar_plano_por_nome(conexao, nome_plano):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT id FROM planos 
+        WHERE nome = %s
+        """, (nome_plano,))
+        plano = cursor.fetchone()
+        return plano[0] if plano else None
+    except Error as erro:
+        print(f"Erro ao buscar plano: {erro}")
+        return None
+    finally:
+        cursor.close()
+
+def buscar_adm_por_email(conexao, email):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT id_adm FROM administradores WHERE email = %s", (email,))
+        administrador = cursor.fetchone()
+        return administrador[0] if administrador else None
+    except Error as erro:
+        print(f"Erro ao buscar administrador: {erro}")
+        return None
+    finally:
+        cursor.close()
