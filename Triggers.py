@@ -25,3 +25,24 @@ def safe_security(conexao):
     finally:
         cursor.close()
 
+def atualiza_acesso(conexao):
+    try:
+        cursor = conexao.cursor()
+        query = """
+        CREATE TRIGGER safe_security
+        AFTER INSERT ON compartilhamentos
+        FOR EACH ROW
+        BEGIN 
+            UPDATE compartilhamentos
+            SET id_usuario_compartilhado = NEW.id_usuario_compartilhado
+            WHERE id_arquivo = NEW.id_arquivo;
+        END;
+        """
+        cursor.execute(query)
+        cursor.commit()
+        print("Trigger atualiza_acesso criada com sucesso!")
+    except Error as erro:
+        print(f"Erro ao criar trigger atualiza_acesso {erro}")
+        return None
+    finally:
+        cursor.close()
