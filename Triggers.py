@@ -46,3 +46,27 @@ def atualiza_acesso(conexao):
         return None
     finally:
         cursor.close()
+
+def registrar_operacao(conexao):
+    try:
+        cursor = conexao.cursor()
+
+        query = """
+        CREATE TRIGGER registrar_operacao
+        AFTER INSERT ON arquivos
+        FOR EACH ROW
+        BEGIN
+            UPDATE atividades_recentes
+            SET ultima_versao = NOW()
+            WHERE id_arquivo = NEW.id;
+        END;
+        """
+        cursor.execute(query)
+
+        conexao.commit()
+        print("Trigger 'registrar_operacao' criada com sucesso!")
+
+    except mysql.connector.Error as err:
+        print(f"Erro ao criar a trigger: {err}")
+    finally:
+        cursor.close()
