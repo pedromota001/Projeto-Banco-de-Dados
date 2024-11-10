@@ -10,8 +10,9 @@ import RemocaoNoBanco
 import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
     buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo
-from RemocaoNoBanco import remove_arquivo_por_id
-from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios
+from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento
+from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios, \
+    insert_historico_versionamento
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
@@ -230,6 +231,7 @@ def exibeMenuUsuario(conexao):
             6 - Fazer comentario em arquivo
             7 - Fazer operacoes em arquivos
             8 - Listar comentario de arquivo
+            9 - Pedir suporte a adm
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
@@ -249,9 +251,16 @@ def exibeMenuUsuario(conexao):
                 for arquivo in arquivos:
                     print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
                 nomeRemover = str(input("Digite o nome do arquivo que voce deseja remover: "))
-                RemocaoNoBanco.removeArquivo(conexao, nomeRemover)
-                print("Remocao concluida!!!")
-                conexao.commit()
+                id_arquivo = buscar_arquivoPor_nome(conexao, nomeRemover)
+                if id_arquivo:
+                    operacao = "remover"
+                    date_op = datetime.now().date()
+                    hora_op = datetime.now().time()
+                    insert_operacoes(conexao, date_op, hora_op, operacao, usuario)
+                    remocao_historico_versionamento(conexao, id_arquivo)
+                    remove_arquivo_por_id(conexao, id_arquivo)
+                else:
+                    print("Arquivo nao existe no banco!\n")
             elif op == 4:
                 arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
                 if arquivos:
@@ -282,8 +291,8 @@ def exibeMenuUsuario(conexao):
                 if id_arquivo_achado:
                     print("""\n
                     1 - Carregar
-                    2 - Remover 
-                    3 - Atualizar nome do arquivo
+                    2 - Atualizar nome do arquivo
+                    0 - Sair
                     \n
                     """)
                     tipo_operacao = int(input("Especifique o tipo de operacao que voce deseja fazer: "))
@@ -291,14 +300,10 @@ def exibeMenuUsuario(conexao):
                         operacao = "carregar"
                         pass
                     elif tipo_operacao == 2:
-                        operacao = "remover"
-                        date_op = datetime.now().date()
-                        hora_op = datetime.now().time()
-                        insert_operacoes(conexao, date_op, hora_op, operacao, usuario)
-                        remove_arquivo_por_id(conexao, id_arquivo_achado)
-                    else:
                         operacao = "atualizar"
                         ##implementar
+                    else:
+                        return
             elif op == 8:
                 arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
                 if arquivos:
@@ -314,22 +319,11 @@ def exibeMenuUsuario(conexao):
                                   f"\nData do comentario: {comentario[1]}\n")
                     else:
                         print("Arquivo nao existe no banco!")
+            elif op == 9:
+                pass
 
-
-
-
-
-
-
-
-        #implementar outras opcoes
     else:
         print("Usuario nao cadastrado no banco")
-
-def setAdmRole(conexao):
-    pass
-##implementar
-
 
 def exibe_menu_adm(conexao):
     login = str(input("Digite seu login: "))
@@ -344,16 +338,16 @@ def exibe_menu_adm(conexao):
             2 - Inserir instituição 
             3 - Inserir usuario no banco de dados
             4 - Inserir arquivo associado a um usuario
+            5 - 
             0 - Sair
             """)
             op = int(input("Digite sua opção: "))
             if op == 1:
                 insercaoNoBanco.insert_planos(conexao)
             elif op == 2:
-
-                insercaoNoBanco.insert_instituicao(conexao)
+                insercaoNoBanco.insert_instituicoes(conexao)
             elif op == 3:
-                insercaoNoBanco.inserir_usuario(conexao)
+                insercaoNoBanco.insert_usuarios(conexao)
             elif op == 4:
                 pass
     else:

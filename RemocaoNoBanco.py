@@ -16,6 +16,19 @@ def removeArquivo(conexao, valor_remover):
 
 
 
+def remocao_historico_versionamento(conexao, id_arquivo):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        DELETE FROM historico_versionamento WHERE id_arquivo = %s;
+        """, (id_arquivo,))
+        conexao.commit()
+    except Error as erro:
+        print(f"Erro ao remover de historico de versionamento: {erro}")
+        return None
+    finally:
+        cursor.close()
+
 def remove_arquivo_por_id(conexao, id_arquivo):
     try:
         cursor = conexao.cursor()
@@ -26,7 +39,7 @@ def remove_arquivo_por_id(conexao, id_arquivo):
         conexao.commit()
         print("Remocao efetuada!")
     except Error as erro:
-        print("Erro ao remover arquivo: {erro}")
+        print(f"Erro ao remover arquivo: {erro}")
         return None
     finally:
         cursor.close()

@@ -2,7 +2,8 @@ from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
 
-from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, buscar_adm_por_email
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, buscar_adm_por_email, \
+    buscar_plano_por_nome, buscar_instituicao_por_nome
 
 
 def insert_arquivos(conexao, id_usuario):
@@ -18,6 +19,7 @@ def insert_arquivos(conexao, id_usuario):
         INSERT INTO arquivos(permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario)VALUES(%s,%s,%s,%s,%s,%s, %s);
         """, (permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario))
         print("Insercao efetuada com sucesso! ")
+        insert_historico_versionamento(conexao, nome, id_usuario, operacao_historico="criacao")
     except Error as erro:
         print(f"Erro ao inserir arquivo: {erro}")
         return None
@@ -109,24 +111,19 @@ def insert_comentarios(conexao, nome_arquivo, id_usuario):
         cursor.close()
 
 
-def insert_historico_versionamento(conexao):
+def insert_historico_versionamento(conexao, nome_arquivo, id_usuario, operacao_historico):
     try:
         cursor = conexao.cursor()
-        data_historico = input("Digite a data do histórico (AAAA-MM-DD): ")
-        hora_historico = input("Digite a hora do histórico (HH:MM:SS): ")
-        operacao_historico = input("Digite a operação realizada: ")
-        email_usuario = input("Digite o email do usuário que realizou a alteração: ")
-        nome_arquivo = input("Digite o nome do arquivo ao qual o histórico está atrelado: ")
-
-        id_usuario = buscar_usuario_por_email(conexao, email_usuario)
+        conteudo_mudado = str(input("Digite oq voce fez no arquivo"))
         id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
-
-        if id_usuario and id_arquivo:
+        data_historico = datetime.now().date()
+        hora_historico = datetime.now().time()
+        if id_arquivo:
             cursor.execute("""
             INSERT INTO historico_versionamento(data_historico, hora_historico, operacao_historico, 
-                                                id_usuario_alterou, id_arquivo) 
-            VALUES (%s, %s, %s, %s, %s);
-            """, (data_historico, hora_historico, operacao_historico, id_usuario, id_arquivo))
+                                                id_usuario_alterou, conteudo_mudado, id_arquivo) 
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """, (data_historico, hora_historico, operacao_historico, id_usuario, conteudo_mudado, id_arquivo))
             conexao.commit()
             print("Histórico de versionamento inserido com sucesso!")
         else:
