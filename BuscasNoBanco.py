@@ -56,6 +56,26 @@ def buscar_arquivos_usuario_view(conexao):
         cursor.close()
 
 
+def buscar_arquivos_proprios_compartilhados(conexao, id_usuario):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT DISTINCT a.nome
+        FROM arquivos a
+        LEFT JOIN compartilhamentos c ON c.id_arquivo = a.id_arquivo
+        WHERE a.id_usuario = %s OR c.id_usuario_compartilhado = %s;
+        """, (id_usuario, id_usuario))
+        busca = cursor.fetchall()
+        if busca:
+            return busca
+        else:
+            return None
+    except Error as erro:
+        print(f"Erro ao buscar todos os arquivos do usuario: {erro}")
+        return None
+    finally:
+        cursor.close()
+
 
 def buscar_usuario_email(conexao, email):
     try:

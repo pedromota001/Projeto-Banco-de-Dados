@@ -1,4 +1,7 @@
-def Function(conexao):
+import mysql.connector
+from mysql.connector import Error
+
+def function(conexao):
     try:
         cursor = conexao.cursor()
         query = """

@@ -8,7 +8,8 @@ import CriacaoDeRoles
 import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
-from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome
+from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
+    buscar_arquivos_proprios_compartilhados
 from RemocaoNoBanco import remove_arquivo_por_id
 from insercaoNoBanco import insert_compartilhamentos, insert_operacoes
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
@@ -239,7 +240,7 @@ def exibeMenuUsuario(conexao):
             1 - Inserir arquivo no driver
             2 - Listar apenas MEUS arquivos
             3 - Deletar arquivo do drive
-            4 - Listar arquivos meus e compartilhados
+            4 - Listar TODOS os arquivos(Meus e compartilhados)
             5 - Compartilhar arquivo com outro usuario(atraves do email)
             6 - Fazer comentario em arquivo
             7 - Fazer operacoes em arquivos
@@ -266,7 +267,13 @@ def exibeMenuUsuario(conexao):
                 print("Remocao concluida!!!")
                 conexao.commit()
             elif op == 4:
-                pass
+                arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
+                if arquivos:
+                    print("Arquivos compartilhados e seus: \n")
+                    for arquivo in arquivos:
+                        print(f"Arquivo: {arquivo[0]}\n")
+                else:
+                    print("Voce nao possui nenhum arquivo no drive! ")
             elif op == 5:
                 insert_compartilhamentos(conexao,usuario)
             elif op == 6:
