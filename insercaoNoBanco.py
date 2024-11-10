@@ -88,19 +88,14 @@ def insert_usuarios(conexao):
         cursor.close()
 
 
-def insert_comentarios(conexao):
+def insert_comentarios(conexao, nome_arquivo, id_usuario):
     try:
         cursor = conexao.cursor()
+        data_comentario = datetime.now().date()
+        hora_comentario = datetime.now().time()
         conteudo = input("Digite o conteúdo do comentário: ")
-        data_comentario = input("Digite a data do comentário (AAAA-MM-DD): ")
-        hora_comentario = input("Digite a hora do comentário (HH:MM:SS): ")
-        email_usuario = input("Digite o email do usuário que fez o comentário: ")
-        nome_arquivo = input("Digite o nome do arquivo comentado: ")
-
-        id_usuario = buscar_usuario_por_email(conexao, email_usuario)
         id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
-
-        if id_usuario and id_arquivo:
+        if id_arquivo:
             cursor.execute(
                 "INSERT INTO comentarios(conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo) VALUES (%s, %s, %s, %s, %s);",
                 (conteudo, data_comentario, hora_comentario, id_usuario, id_arquivo))

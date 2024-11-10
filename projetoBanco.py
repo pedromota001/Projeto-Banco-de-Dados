@@ -9,9 +9,9 @@ import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
-    buscar_arquivos_proprios_compartilhados
+    buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo
 from RemocaoNoBanco import remove_arquivo_por_id
-from insercaoNoBanco import insert_compartilhamentos, insert_operacoes
+from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
@@ -197,19 +197,6 @@ def criar_tabelas(cursor):
     print("Tabela 'atividades_recentes' criada com sucesso.")
 
 
-def defineUserLogado(conexao, id_usuario):
-    try:
-        cursor = conexao.cursor()
-        cursor.execute("""
-        set @usuario_id_logado = %s
-        """, (id_usuario,))
-        conexao.commit()
-    except Error as erro:
-        print(f"Erro ao definir usuario logado: {erro}")
-        return None
-    finally:
-        cursor.close()
-
 def exibeMenu():
         print("""
             OPCOES DE LOGIN
@@ -229,8 +216,6 @@ def exibeMenuUsuario(conexao):
     senha = str(input("Digite sua senha: "))
     usuario = BuscasNoBanco.buscar_usuario(conexao, login, senha)
     if usuario:
-        defineUserLogado(conexao, usuario)
-        ##view_arquivo_usuario(conexao)
         op = -1
         print("Bem vindo!!!!")
         while op != 0:
@@ -244,6 +229,7 @@ def exibeMenuUsuario(conexao):
             5 - Compartilhar arquivo com outro usuario(atraves do email)
             6 - Fazer comentario em arquivo
             7 - Fazer operacoes em arquivos
+            8 - Listar comentario de arquivo
             0 - Sair
             """)
             op = int(input("Digite sua opcao: "))
@@ -277,7 +263,15 @@ def exibeMenuUsuario(conexao):
             elif op == 5:
                 insert_compartilhamentos(conexao,usuario)
             elif op == 6:
-                pass
+                arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
+                if arquivos:
+                    print("Arquivos que voce pode comentar: ")
+                    for arquivo in arquivos:
+                        print(f"Arquivo: {arquivo[0]}\n")
+                    arquivo_comentario = str(input("Digite o arquivo que voce deseja comentar: "))
+                    insert_comentarios(conexao, arquivo_comentario, usuario)
+                else:
+                    print("Voce nao pode comentar em nenhum arquivo! \n")
             elif op == 7:
                 print("Seus arquivos: ")
                 arquivos = buscar_arquivos_usuario(conexao, usuario)
@@ -305,6 +299,22 @@ def exibeMenuUsuario(conexao):
                     else:
                         operacao = "atualizar"
                         ##implementar
+            elif op == 8:
+                arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
+                if arquivos:
+                    print("Arquivos que voce pode visualizar comentarios: ")
+                    for arquivo in arquivos:
+                        print(f"Arquivo: {arquivo[0]}\n")
+                    arquivo_comentario = str(input("Digite o nome do arquivo que voce deseja visualizar os comentarios: "))
+                    id_arquivo = buscar_arquivoPor_nome(conexao, arquivo_comentario)
+                    if id_arquivo:
+                        comentarios = buscar_comentarios_arquivo(conexao, id_arquivo)
+                        for comentario in comentarios:
+                            print(f"\nComentario: {comentario[0]}"
+                                  f"\nData do comentario: {comentario[1]}\n")
+                    else:
+                        print("Arquivo nao existe no banco!")
+
 
 
 

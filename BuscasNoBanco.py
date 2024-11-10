@@ -176,3 +176,22 @@ def buscar_adm_por_email(conexao, email):
         return None
     finally:
         cursor.close()
+
+
+def buscar_comentarios_arquivo(conexao, id_arquivo):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT c.conteudo, c.data_comentario FROM
+        comentarios c WHERE c.id_arquivo = %s 
+        """, (id_arquivo,))
+        comentarios = cursor.fetchall()
+        if comentarios:
+            return comentarios
+        else:
+            print("Sem comentarios nesse arquivo! \n")
+    except Error as erro:
+        print(f"Erro ao buscar comentario: {erro}")
+        return None
+    finally:
+        cursor.close()
