@@ -13,8 +13,9 @@ def view_arquivo_usuario(conexao, id_usuario):
         WHERE id_usuario_dono = @id_usuario_logado OR id_usuario_compartilhado = @id_usuario_logado
         """)
         conexao.commit()
+        print(" A view: 'view_arquivo_usuario' foi criada com sucesso!")
     except Error as erro:
-        print(f"Nao foi possivel criar view: {erro}")
+        print(f"Não foi possível criar view: {erro}")
         return None
     finally:
         cursor.close()
@@ -47,9 +48,10 @@ def view_administradores(conexao):
             LEFT JOIN 
                 historico_versionamento h ON h.id_arquivo = a.id_arquivo;
         """)
+        conexao.commit()
         print(" A view: 'view_administradores' foi criada com sucesso!")
     except Error as erro:
-        print(f"Nao foi possivel criar a view: {erro}")
+        print(f"Não foi possível criar a view: {erro}")
     finally:
         cursor.close()
 
@@ -67,9 +69,10 @@ def view_historico_usuario(conexao):
         WHERE o.id_usuario = @id_usuario_logado;                                                                                                                                      
         """)
         cursor.execute("GRANT SELECT ON historico_operacoes_usuario TO usuario_logado;")
-        conexao.commit()                   
+        conexao.commit()
+        print(" A view: 'view_historico_usuario' foi criada com sucesso!")
     except Error as erro:
-        print(f"Nao foi possivel criar view: {erro}")
+        print(f"Não foi possivel criar view: {erro}")
         return None
     finally:
         cursor.close()

@@ -13,7 +13,7 @@ def buscar_usuario(conexao, login, senha):
         else:
             return None
     except Error as erro:
-        print(f"Erro ao buscar usuario: {erro}")
+        print(f"Erro ao buscar usuário: {erro}")
         return None
     finally:
         cursor.close()
@@ -49,7 +49,7 @@ def buscar_arquivos_usuario_view(conexao):
             for linha in resultados:
                 print(linha)
         else:
-            print("Voce nao possui arquivos no drive! ")
+            print("Você não possui arquivos no drive! ")
     except Error as erro:
         print(f"Erro ao buscar view: {erro}")
     finally:
@@ -71,7 +71,7 @@ def buscar_arquivos_proprios_compartilhados(conexao, id_usuario):
         else:
             return None
     except Error as erro:
-        print(f"Erro ao buscar todos os arquivos do usuario: {erro}")
+        print(f"Erro ao buscar todos os arquivos do usuário: {erro}")
         return None
     finally:
         cursor.close()
@@ -90,7 +90,7 @@ def buscar_usuario_email(conexao, email):
         else:
             return None
     except Error as erro:
-        print(f"Nao foi possivel buscar o usuario pelo email: {erro}")
+        print(f"Não foi possível buscar o usuário pelo email: {erro}")
         return None
     finally:
         cursor.close()
@@ -109,7 +109,7 @@ def buscar_adm(conexao, login, senha):
         else:
             return None
     except Error as erro:
-        print(f"Não foi possivel buscar o administrador: {erro}")
+        print(f"Não foi possível buscar o administrador: {erro}")
         return None
     finally:
         cursor.close()
@@ -130,7 +130,7 @@ def buscar_arquivoPor_nome(conexao, nome):
         else:
             return None
     except Error as erro:
-        print(f"Nao foi possivel buscar o arquivo pelo nome: {erro}")
+        print(f"Não foi possível buscar o arquivo pelo nome: {erro}")
         return None
     finally:
         cursor.close()
@@ -189,9 +189,9 @@ def buscar_comentarios_arquivo(conexao, id_arquivo):
         if comentarios:
             return comentarios
         else:
-            print("Sem comentarios nesse arquivo! \n")
+            print("Sem comentários nesse arquivo! \n")
     except Error as erro:
-        print(f"Erro ao buscar comentario: {erro}")
+        print(f"Erro ao buscar comentário: {erro}")
         return None
     finally:
         cursor.close()

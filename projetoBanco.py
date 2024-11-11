@@ -201,10 +201,10 @@ def criar_tabelas(cursor):
 
 def exibeMenu():
         print("""
-            OPCOES DE LOGIN
-            1 - Usuario
+            OPÇÕES DE LOGIN
+            1 - Usuário
             2 - Administrador 
-            3 - Se cadastrar como usuario, caso nao tenha conta
+            3 - Se cadastrar como usuário, caso não tenha conta
             4 - Atualizar senha
             5 - Atualizar email
             0 - Encerrar
@@ -227,18 +227,18 @@ def exibeMenuUsuario(conexao):
             1 - Inserir arquivo no driver
             2 - Listar apenas MEUS arquivos
             3 - Deletar arquivo do drive
-            4 - Listar TODOS os arquivos(Meus e compartilhados)
-            5 - Compartilhar arquivo com outro usuario(atraves do email)
-            6 - Fazer comentario em arquivo
-            7 - Fazer operacoes em arquivos
-            8 - Listar comentario de arquivo
+            4 - Listar TODOS os arquivos (Meus e compartilhados)
+            5 - Compartilhar arquivo com outro usuário (através do email)
+            6 - Fazer comentário em arquivo
+            7 - Fazer operações em arquivos
+            8 - Listar comentário de arquivo
             9 - Pedir suporte a adm
             0 - Sair
             """)
-            op = int(input("Digite sua opcao: "))
+            op = int(input("Digite sua opção: "))
             if op == 1:
                 insercaoNoBanco.insert_arquivos(conexao, usuario)
-                operacao = "criacao"
+                operacao = "criação"
                 date_op = datetime.now().date()
                 hora_op = datetime.now().time()
                 insert_operacoes(conexao,date_op, hora_op, operacao, usuario)
@@ -249,7 +249,7 @@ def exibeMenuUsuario(conexao):
                     for arquivo in arquivos:
                         print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
                 else:
-                    print("Voce nao tem arquivos no drive")
+                    print("Voce não tem arquivos no drive")
             elif op == 3:
                 print("Seus arquivos: ")
                 arquivos = buscar_arquivos_usuario(conexao, usuario)
@@ -265,7 +265,7 @@ def exibeMenuUsuario(conexao):
                     remocao_historico_versionamento(conexao, id_arquivo)
                     remove_arquivo_por_id(conexao, id_arquivo)
                 else:
-                    print("Arquivo nao existe no banco!\n")
+                    print("Arquivo não existe no banco!\n")
             elif op == 4:
                 arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
                 if arquivos:
@@ -273,13 +273,13 @@ def exibeMenuUsuario(conexao):
                     for arquivo in arquivos:
                         print(f"Arquivo: {arquivo[0]}\n")
                 else:
-                    print("Voce nao possui nenhum arquivo no drive! ")
+                    print("Você não possui nenhum arquivo no drive! ")
             elif op == 5:
                 insert_compartilhamentos(conexao,usuario)
             elif op == 6:
                 arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
                 if arquivos:
-                    print("Arquivos que voce pode comentar: ")
+                    print("Arquivos que você pode comentar: ")
                     for arquivo in arquivos:
                         print(f"Arquivo: {arquivo[0]}\n")
                     arquivo_comentario = str(input("Digite o arquivo que voce deseja comentar: "))
@@ -300,7 +300,7 @@ def exibeMenuUsuario(conexao):
                     0 - Sair
                     \n
                     """)
-                    tipo_operacao = int(input("Especifique o tipo de operacao que voce deseja fazer: "))
+                    tipo_operacao = int(input("Especifique o tipo de operação que você deseja fazer: "))
                     if tipo_operacao == 1:
                         operacao = "carregar"
                         insert_historico_versionamento(conexao, id_arquivo_achado, usuario, operacao)
@@ -312,13 +312,13 @@ def exibeMenuUsuario(conexao):
                         conexao.commit()
                         pass
                     elif tipo_operacao == 2:
-                        operacao = "Atualizacao"
+                        operacao = "Atualização"
                         print("""
                         1 - Atualizar nome
-                        2 - Atualizar permissao 
+                        2 - Atualizar permissão 
                         3 - Atualizar url
                         """)
-                        op = int(input("Digite sua opcao: \n"))
+                        op = int(input("Digite sua opção: \n"))
                         if op == 1:
                             novo_nome = str(input("Digite o novo nome: "))
                             atualizar_arquivo(conexao.cursor(), novo_nome, id_arquivo_achado, coluna="nome")
@@ -330,8 +330,8 @@ def exibeMenuUsuario(conexao):
                                 insert_atv_recentes(conexao, id_arquivo_achado)
                             conexao.commit()
                         elif op == 2:
-                            nova_permissao = int(input("Digite a nova permissao(Permissao total(1) ou somente de visualizacao(0) do arquivo: "))
-                            atualizar_arquivo(conexao.cursor(), nova_permissao, id_arquivo_achado, coluna="permissao")
+                            nova_permissao = int(input("Digite a nova permissão (Permissão total(1) ou somente de visualização(0) do arquivo: "))
+                            atualizar_arquivo(conexao.cursor(), nova_permissao, id_arquivo_achado, coluna="permissão")
                             insert_historico_versionamento(conexao, id_arquivo_achado, usuario, operacao)
                             atividade_existe = busca_atv_recentes(conexao, id_arquivo_achado)
                             if atividade_existe:
@@ -354,23 +354,23 @@ def exibeMenuUsuario(conexao):
             elif op == 8:
                 arquivos = buscar_arquivos_proprios_compartilhados(conexao, usuario)
                 if arquivos:
-                    print("Arquivos que voce pode visualizar comentarios: ")
+                    print("Arquivos que voce pode visualizar comentários: ")
                     for arquivo in arquivos:
                         print(f"Arquivo: {arquivo[0]}\n")
-                    arquivo_comentario = str(input("Digite o nome do arquivo que voce deseja visualizar os comentarios: "))
+                    arquivo_comentario = str(input("Digite o nome do arquivo que você deseja visualizar os comentários: "))
                     id_arquivo = buscar_arquivoPor_nome(conexao, arquivo_comentario)
                     if id_arquivo:
                         comentarios = buscar_comentarios_arquivo(conexao, id_arquivo)
                         for comentario in comentarios:
-                            print(f"\nComentario: {comentario[0]}"
-                                  f"\nData do comentario: {comentario[1]}\n")
+                            print(f"\nComentário: {comentario[0]}"
+                                  f"\nData do comentário: {comentario[1]}\n")
                     else:
-                        print("Arquivo nao existe no banco!")
+                        print("Arquivo não existe no banco!")
             elif op == 9:
                 pass
 
     else:
-        print("Usuario nao cadastrado no banco")
+        print("Usuário não cadastrado no banco")
 
 def exibe_menu_adm(conexao):
     login = str(input("Digite seu login: "))
@@ -383,8 +383,8 @@ def exibe_menu_adm(conexao):
             print("""
             1 - Inserir planos
             2 - Inserir instituição 
-            3 - Inserir usuario no banco de dados
-            4 - Inserir arquivo associado a um usuario
+            3 - Inserir usuário no banco de dados
+            4 - Inserir arquivo associado a um usuário
             5 - 
             0 - Sair
             """)
@@ -439,7 +439,7 @@ def main():
             ##conta_usuario(conexao)
             total_usuarios = 0
             total_usuarios = cursor.callproc("ContaUsuarios", [2,total_usuarios])
-            print(f"Total de usuarios: {total_usuarios[1]}")
+            print(f"Total de usuários: {total_usuarios[1]}")
 
             ##chavear_arquivo(conexao)
             #cursor.callproc("chavear_arquivo", [1])
@@ -468,12 +468,12 @@ def main():
                             conexao.commit()
                             print("Senha atualizada!")
                         else:
-                            print("Usuario nao existe no banco, erro ao alterar senha \n")
+                            print("Usuário não existe no banco, erro ao alterar senha \n")
                     else:
-                        print("Nao foi possivel atualizar, as senhas nao coincidem")
+                        print("Não foi possível atualizar, as senhas não coincidem")
                 elif resp == 5:
                     print("teste")
-            print("Encerrando aplicacao...")
+            print("Encerrando aplicação...")
         except Error as erro:
             print(f"Erro ao criar banco de dados ou tabelas: {erro}")
         finally:
