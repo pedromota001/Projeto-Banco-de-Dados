@@ -9,7 +9,7 @@ def removeArquivo(conexao, valor_remover):
             WHERE nome = %s
             """, (valor_remover,))
     except Error as erro:
-        print(f"Erro ao remover usuario: {erro}")
+        print(f"Erro ao remover usuário: {erro}")
         return None
     finally:
         cursor.close()
@@ -24,7 +24,7 @@ def remocao_historico_versionamento(conexao, id_arquivo):
         """, (id_arquivo,))
         conexao.commit()
     except Error as erro:
-        print(f"Erro ao remover de historico de versionamento: {erro}")
+        print(f"Erro ao remover de histórico de versionamento: {erro}")
         return None
     finally:
         cursor.close()
@@ -37,7 +37,7 @@ def remove_arquivo_por_id(conexao, id_arquivo):
         WHERE id_arquivo = %s
         """, (id_arquivo,))
         conexao.commit()
-        print("Remocao efetuada!")
+        print("Remoção efetuada!")
     except Error as erro:
         print(f"Erro ao remover arquivo: {erro}")
         return None

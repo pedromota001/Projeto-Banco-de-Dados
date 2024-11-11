@@ -13,12 +13,12 @@ def insert_arquivos(conexao, id_usuario):
         tipo = input("Digite o tipo desse arquivo: ")
         url = input("Digite o url do arquivo: ")
         tam = input("Digite o tamanho desse arquivo: ")
-        permissao = input("Digite o tipo de permissao desse arquivo: ")
+        permissao = input("Digite o tipo de permissão desse arquivo: ")
         data_ult_modificacao = datetime.now()
         cursor.execute("""
         INSERT INTO arquivos(permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario)VALUES(%s,%s,%s,%s,%s,%s, %s);
         """, (permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario))
-        print("Insercao efetuada com sucesso! ")
+        print("Inserção efetuada com sucesso! ")
     except Error as erro:
         print(f"Erro ao inserir arquivo: {erro}")
         return None
@@ -113,7 +113,7 @@ def insert_comentarios(conexao, nome_arquivo, id_usuario):
 def insert_historico_versionamento(conexao, id_arquivo, id_usuario, operacao_historico):
     try:
         cursor = conexao.cursor()
-        conteudo_mudado = str(input("Digite oq voce fez no arquivo: "))
+        conteudo_mudado = str(input("Digite o que você fez no arquivo: "))
         data_historico = datetime.now().date()
         hora_historico = datetime.now().time()
         if id_arquivo:
@@ -150,13 +150,13 @@ def insert_operacoes(conexao, data_op, hora_op, tipo_operacao, id_usuario):
 def insert_compartilhamentos(conexao, id_usuario_dono):
     try:
         cursor = conexao.cursor()
-        email = str(input("Digita o email do usuario que voce quer compartilhar um arquivo: "))
+        email = str(input("Digita o email do usuário que você quer compartilhar um arquivo: "))
         id_usuario_compartilhado = buscar_usuario_email(conexao, email)
         if id_usuario_compartilhado:
             arquivos = buscar_arquivos_usuario(conexao, id_usuario_dono)
             for arquivo in arquivos:
                 print(f"\nDono:{arquivo[0]}\nNome do arquivo: {arquivo[1]}")
-            nomeArquivo = str(input("Digite o nome do arquivo que voce ira compartilhar: "))
+            nomeArquivo = str(input("Digite o nome do arquivo que você irá compartilhar: "))
             id_arquivo = buscar_arquivoPor_nome(conexao, nomeArquivo)
             if id_arquivo:
                 data_compartilhado = datetime.now().date()
@@ -167,9 +167,9 @@ def insert_compartilhamentos(conexao, id_usuario_dono):
                 conexao.commit()
                 print("Compartilhamento inserido com sucesso!")
             else:
-                print("\nErro! Arquivo nao existe no banco de dados.")
+                print("\nErro! Arquivo não existe no banco de dados.")
         else:
-            print("\nUsuario nao existe no banco, tente outro email! ")
+            print("\nUsuário não existe no banco, tente outro email! ")
     except Error as erro:
         print(f"Erro ao inserir compartilhamento: {erro}")
     finally:
