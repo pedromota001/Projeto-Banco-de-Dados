@@ -1,5 +1,5 @@
 # Projeto-Banco-de-Dados
 Projeto da disciplina de banco de dados
 
-##Equipe
+## Equipe
 Gustavo Porto, Luís Gustavo, Miguel Procópio, Pedro Mota.
