@@ -237,6 +237,10 @@ def exibeMenuUsuario(conexao):
             op = int(input("Digite sua opcao: "))
             if op == 1:
                 insercaoNoBanco.insert_arquivos(conexao, usuario)
+                operacao = "criacao"
+                date_op = datetime.now().date()
+                hora_op = datetime.now().time()
+                insert_operacoes(conexao,date_op, hora_op, operacao, usuario)
                 conexao.commit()
             elif op == 2:
                 arquivos = buscar_arquivos_usuario(conexao, usuario)
@@ -298,10 +302,31 @@ def exibeMenuUsuario(conexao):
                     tipo_operacao = int(input("Especifique o tipo de operacao que voce deseja fazer: "))
                     if tipo_operacao == 1:
                         operacao = "carregar"
+                        ##???????????????????????
                         pass
                     elif tipo_operacao == 2:
                         operacao = "atualizar"
-                        ##implementar
+                        print("""
+                        1 - Atualizar nome
+                        2 - Atualizar permissao 
+                        3 - Atualizar url
+                        """)
+                        op = int(input("Digite sua opcao: \n"))
+                        if op == 1:
+                            novo_nome = str(input("Digite o novo nome: "))
+                            atualizar_arquivo(conexao.cursor(), novo_nome, id_arquivo_achado, coluna="nome")
+                            conexao.commit()
+                            break
+                        elif op == 2:
+                            nova_permissao = int(input("Digite a nova permissao(Permissao total(1) ou somente de visualizacao(0) do arquivo: "))
+                            atualizar_arquivo(conexao.cursor(), nova_permissao, id_arquivo_achado, coluna="permissao")
+                            conexao.commit()
+                            break
+                        else:
+                            novo_url = str(input("Digite o novo url: "))
+                            atualizar_arquivo(conexao.cursor(), novo_url, id_arquivo_achado, coluna="url")
+                            conexao.commit()
+                            break
                     else:
                         return
             elif op == 8:
@@ -354,15 +379,21 @@ def exibe_menu_adm(conexao):
         print("Esse adm não existe no banco de dados")
 
 
-def atualizar(cursor, novoValor, chave, tabela, coluna):
+def atualizar_usuario(cursor, novoValor, chave, coluna):
     query = f"""
-    UPDATE {tabela} 
+    UPDATE usuarios 
     SET {coluna} = %s
-    WHERE email = %s
+    WHERE id_usuario = %s
     """
     cursor.execute(query, (novoValor, chave))
 
-
+def atualizar_arquivo(cursor, novo_valor, chave, coluna):
+    query = f"""
+    UPDATE arquivos 
+    SET {coluna} = %s
+    WHERE id_arquivo = %s
+    """
+    cursor.execute(query, (novo_valor, chave))
 
 def main():
     conexao = criar_conexao()
@@ -406,9 +437,13 @@ def main():
                     senha = str(input("Digite a sua senha: "))
                     senhaConfirma = str(input("Repita a nova senha: "))
                     if senha == senhaConfirma:
-                        atualizar(cursor, senhaConfirma, email, tabela="usuarios", coluna="senha")
-                        conexao.commit()
-                        print("Senha atualizada!")
+                        usuario = buscar_usuario_email(conexao, email)
+                        if usuario:
+                            atualizar(cursor, senhaConfirma, usuario, tabela="usuarios", coluna="senha")
+                            conexao.commit()
+                            print("Senha atualizada!")
+                        else:
+                            print("Usuario nao existe no banco, erro ao alterar senha \n")
                     else:
                         print("Nao foi possivel atualizar, as senhas nao coincidem")
                 elif resp == 5:

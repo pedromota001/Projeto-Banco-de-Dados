@@ -29,7 +29,7 @@ def atualiza_acesso(conexao):
     try:
         cursor = conexao.cursor()
         query = """
-        CREATE TRIGGER safe_security
+        CREATE TRIGGER atualiza_acesso
         AFTER INSERT ON compartilhamentos
         FOR EACH ROW
         BEGIN 
