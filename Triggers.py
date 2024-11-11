@@ -53,12 +53,12 @@ def registrar_operacao(conexao):
 
         query = """
         CREATE TRIGGER registrar_operacao
-        AFTER INSERT ON arquivos
+        AFTER UPDATE ON arquivos
         FOR EACH ROW
         BEGIN
             UPDATE atividades_recentes
             SET ultima_versao = NOW()
-            WHERE id_arquivo = NEW.id;
+            WHERE id_arquivo = NEW.id_arquivo;
         END;
         """
         cursor.execute(query)

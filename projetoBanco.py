@@ -11,6 +11,7 @@ import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
     buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo
 from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento
+from Triggers import safe_security, registrar_operacao
 from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios, \
     insert_historico_versionamento
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
@@ -316,17 +317,14 @@ def exibeMenuUsuario(conexao):
                             novo_nome = str(input("Digite o novo nome: "))
                             atualizar_arquivo(conexao.cursor(), novo_nome, id_arquivo_achado, coluna="nome")
                             conexao.commit()
-                            break
                         elif op == 2:
                             nova_permissao = int(input("Digite a nova permissao(Permissao total(1) ou somente de visualizacao(0) do arquivo: "))
                             atualizar_arquivo(conexao.cursor(), nova_permissao, id_arquivo_achado, coluna="permissao")
                             conexao.commit()
-                            break
                         else:
                             novo_url = str(input("Digite o novo url: "))
                             atualizar_arquivo(conexao.cursor(), novo_url, id_arquivo_achado, coluna="url")
                             conexao.commit()
-                            break
                     else:
                         return
             elif op == 8:
@@ -402,7 +400,10 @@ def main():
             cursor = conexao.cursor()
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
-            CriacaoDeViews.view_administradores(conexao)
+            ##safe_security(conexao)
+            registrar_operacao(conexao)
+            ##CriacaoDeViews.view_administradores(conexao)
+
             ##CriacaoDeRoles.cria_role_PapelAdm(conexao)
 
             ##verificar_atividades(conexao)
