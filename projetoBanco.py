@@ -9,11 +9,11 @@ import CriacaoDeViews
 import RemocaoNoBanco
 import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
-    buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo
+    buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo, busca_atv_recentes
 from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento
 from Triggers import safe_security, registrar_operacao
 from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios, \
-    insert_historico_versionamento
+    insert_historico_versionamento, insert_atv_recentes
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
@@ -76,7 +76,7 @@ def criar_tabelas(cursor):
         );
     """)
     print("Tabela 'usuarios' criada com sucesso.")
-##alterar permissao de boolean para varchar talvez.
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS arquivos(
             id_arquivo INT AUTO_INCREMENT,
@@ -295,18 +295,24 @@ def exibeMenuUsuario(conexao):
                 id_arquivo_achado = buscar_arquivoPor_nome(conexao, arquivo)
                 if id_arquivo_achado:
                     print("""\n
-                    1 - Carregar
-                    2 - Atualizar nome do arquivo
+                    1 - Carregar/ ?
+                    2 - Atualizar arquivo
                     0 - Sair
                     \n
                     """)
                     tipo_operacao = int(input("Especifique o tipo de operacao que voce deseja fazer: "))
                     if tipo_operacao == 1:
                         operacao = "carregar"
-                        ##???????????????????????
+                        insert_historico_versionamento(conexao, id_arquivo_achado, usuario, operacao)
+                        atividade_existe = busca_atv_recentes(conexao, id_arquivo_achado)
+                        if atividade_existe:
+                            continue
+                        else:
+                            insert_atv_recentes(conexao, id_arquivo_achado)
+                        conexao.commit()
                         pass
                     elif tipo_operacao == 2:
-                        operacao = "atualizar"
+                        operacao = "Atualizacao"
                         print("""
                         1 - Atualizar nome
                         2 - Atualizar permissao 
@@ -316,14 +322,32 @@ def exibeMenuUsuario(conexao):
                         if op == 1:
                             novo_nome = str(input("Digite o novo nome: "))
                             atualizar_arquivo(conexao.cursor(), novo_nome, id_arquivo_achado, coluna="nome")
+                            insert_historico_versionamento(conexao,id_arquivo_achado, usuario, operacao)
+                            atividade_existe = busca_atv_recentes(conexao, id_arquivo_achado)
+                            if atividade_existe:
+                                continue
+                            else:
+                                insert_atv_recentes(conexao, id_arquivo_achado)
                             conexao.commit()
                         elif op == 2:
                             nova_permissao = int(input("Digite a nova permissao(Permissao total(1) ou somente de visualizacao(0) do arquivo: "))
                             atualizar_arquivo(conexao.cursor(), nova_permissao, id_arquivo_achado, coluna="permissao")
+                            insert_historico_versionamento(conexao, id_arquivo_achado, usuario, operacao)
+                            atividade_existe = busca_atv_recentes(conexao, id_arquivo_achado)
+                            if atividade_existe:
+                                continue
+                            else:
+                                insert_atv_recentes(conexao, id_arquivo_achado)
                             conexao.commit()
                         else:
                             novo_url = str(input("Digite o novo url: "))
                             atualizar_arquivo(conexao.cursor(), novo_url, id_arquivo_achado, coluna="url")
+                            insert_historico_versionamento(conexao, id_arquivo_achado, usuario, operacao)
+                            atividade_existe = busca_atv_recentes(conexao, id_arquivo_achado)
+                            if atividade_existe:
+                                continue
+                            else:
+                                insert_atv_recentes(conexao, id_arquivo_achado)
                             conexao.commit()
                     else:
                         return
@@ -440,7 +464,7 @@ def main():
                     if senha == senhaConfirma:
                         usuario = buscar_usuario_email(conexao, email)
                         if usuario:
-                            atualizar(cursor, senhaConfirma, usuario, tabela="usuarios", coluna="senha")
+                            atualizar_usuario(cursor, senhaConfirma, usuario, tabela="usuarios", coluna="senha")
                             conexao.commit()
                             print("Senha atualizada!")
                         else:

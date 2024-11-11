@@ -195,3 +195,21 @@ def buscar_comentarios_arquivo(conexao, id_arquivo):
         return None
     finally:
         cursor.close()
+
+
+def busca_atv_recentes(conexao, id_arquivo):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT * FROM atividades_recentes WHERE id_arquivo = %s
+        """, (id_arquivo,))
+        atv_recente = cursor.fetchone()
+        if atv_recente:
+            return atv_recente
+        else:
+            return None
+    except Error as erro:
+        print(f"Erro ao buscar atividade recente: {erro}")
+        return None
+    finally:
+        cursor.close()

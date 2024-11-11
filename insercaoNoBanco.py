@@ -19,7 +19,6 @@ def insert_arquivos(conexao, id_usuario):
         INSERT INTO arquivos(permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario)VALUES(%s,%s,%s,%s,%s,%s, %s);
         """, (permissao, nome, tipo, url, tam, data_ult_modificacao, id_usuario))
         print("Insercao efetuada com sucesso! ")
-        insert_historico_versionamento(conexao, nome, id_usuario, operacao_historico="criacao")
     except Error as erro:
         print(f"Erro ao inserir arquivo: {erro}")
         return None
@@ -111,11 +110,10 @@ def insert_comentarios(conexao, nome_arquivo, id_usuario):
         cursor.close()
 
 
-def insert_historico_versionamento(conexao, nome_arquivo, id_usuario, operacao_historico):
+def insert_historico_versionamento(conexao, id_arquivo, id_usuario, operacao_historico):
     try:
         cursor = conexao.cursor()
-        conteudo_mudado = str(input("Digite oq voce fez no arquivo"))
-        id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
+        conteudo_mudado = str(input("Digite oq voce fez no arquivo: "))
         data_historico = datetime.now().date()
         hora_historico = datetime.now().time()
         if id_arquivo:
@@ -216,3 +214,19 @@ def insert_suportes(conexao):
     finally:
         cursor.close()
 
+def insert_atv_recentes(conexao, id_arquivo):
+    try:
+        cursor = conexao.cursor()
+        ultima_versao = datetime.now().date()
+        acesso = "np"
+        cursor.execute("""
+        INSERT INTO atividades_recentes(ultima_versao, acesso, id_arquivo)
+        VALUES(%s, %s, %s)
+        """, (ultima_versao, acesso, id_arquivo))
+        conexao.commit()
+        print("Atividade recente inserida com sucesso! \n")
+    except Error as erro:
+        print(f"Erro ao inserir na tabela de atividades recentes {erro}")
+        return None
+    finally:
+        cursor.close()
