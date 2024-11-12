@@ -29,14 +29,18 @@ def conta_usuario(conexao):
         cursor.execute("""   
         CREATE PROCEDURE ContaUsuarios(IN arquivo_id INT, OUT total_usuarios INT)
         BEGIN
-            SELECT COUNT(DISTINCT id_usuario) + COUNT(DISTINCT id_usuario_compartilhado) INTO total_usuarios
-            FROM arquivos a 
-            INNER JOIN compartilhamentos c ON c.id_arquivo = a.id_arquivo
+            SET total_usuarios = 0;
+        
+            SELECT COUNT(DISTINCT a.id_usuario) + IFNULL(COUNT(DISTINCT c.id_usuario_compartilhado), 0)
+            INTO total_usuarios
+            FROM arquivos a
+            LEFT JOIN compartilhamentos c ON c.id_arquivo = a.id_arquivo
             WHERE a.id_arquivo = arquivo_id;
+        
             IF total_usuarios IS NULL THEN
                 SET total_usuarios = 0;
             END IF;
-        END; 
+        END;
         """)
         conexao.commit()
     except Error as erro:
@@ -75,7 +79,7 @@ def chavear_arquivo(conexao):
                 WHERE id_arquivo = p_id_arquivo;
             ELSE
                 SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'O arquivo não existe ou não está marcado como prioritário ou não prioritário.';
+                SET MESSAGE_TEXT = 'O arquivo não existe na tabela de atividades recentes ou não está marcado como prioritário ou não prioritário.';
             END IF;
         ELSE
             SIGNAL SQLSTATE '45000'
@@ -112,7 +116,7 @@ def remover_acessos(conexao):
                     UPDATE compartilhamentos
                     SET id_usuario_compartilhado = NULL
                     WHERE id_arquivo = r_id_arquivo
-                    AND id_usuario != v_id_usuario_dono;
+                    AND id_usuario_compartilhado != v_id_usuario_dono;
                 END IF;
             END;                  
         """)

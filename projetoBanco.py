@@ -373,6 +373,7 @@ def exibeMenuUsuario(conexao):
         print("Usuário não cadastrado no banco")
 
 def exibe_menu_adm(conexao):
+    cursor = conexao.cursor()
     login = str(input("Digite seu login: "))
     senha = str(input("Digite sua senha: "))
     adm = BuscasNoBanco.buscar_adm(conexao, login, senha)
@@ -385,7 +386,10 @@ def exibe_menu_adm(conexao):
             2 - Inserir instituição 
             3 - Inserir usuário no banco de dados
             4 - Inserir arquivo associado a um usuário
-            5 - 
+            5 - Atualizar toda a tabela de atividades recentes com a data atual
+            6 - Contar quantos usuarios possuem um mesmo arquivo
+            7 - NP
+            8 - Remover acesso de usuarios sobre um arquivo(Menos o dono)
             0 - Sair
             """)
             op = int(input("Digite sua opção: "))
@@ -397,6 +401,64 @@ def exibe_menu_adm(conexao):
                 insercaoNoBanco.insert_usuarios(conexao)
             elif op == 4:
                 pass
+            elif op == 5:
+                cursor.callproc("verificar_atividades")
+                conexao.commit()
+                for result in cursor.stored_results():
+                    print(result.fetchall()[0][0])
+            elif op == 6:
+                cursor.execute("""
+                SELECT DISTINCT nome_arquivo, email
+                FROM view_administradores;
+                """)
+                resultados = cursor.fetchall()
+                for busca in resultados:
+                    print(f"Dono: {busca[1]}\n"
+                          f"Arquivo: {busca[0]}\n")
+                nome_arquivo = str(input("Digite o nome do arquivo que voce deseja: "))
+                id_arquivo_achado = buscar_arquivoPor_nome(conexao, nome_arquivo)
+                if id_arquivo_achado:
+                    total_usuarios = 0
+                    total_usuarios = cursor.callproc("ContaUsuarios", [id_arquivo_achado,total_usuarios])
+                    print(f"Total de usuários: {total_usuarios[1]}")
+                else:
+                    print("Arquivo nao existe no banco, caro amigo administrador! \n")
+            elif op == 7:
+                cursor.execute("""
+                SELECT DISTINCT nome_arquivo, email
+                FROM view_administradores;
+                """)
+                resultados = cursor.fetchall()
+                for busca in resultados:
+                    print(f"Dono: {busca[1]}\n"
+                          f"Arquivo: {busca[0]}\n")
+                nome_arquivo = str(input("Digite o nome do arquivo que voce deseja: "))
+                id_arquivo_achado = buscar_arquivoPor_nome(conexao, nome_arquivo)
+                if id_arquivo_achado:
+                    cursor.callproc("chavear_arquivo", [id_arquivo_achado])
+                    conexao.commit()
+                    print("Sucesso ao realizar operacao de chavear arquivos! \n")
+                else:
+                    print("Arquivo nao esta no banco, caro amigo administrador!\n")
+            elif op == 8:
+                cursor.execute("""
+                SELECT DISTINCT nome_arquivo, email
+                FROM view_administradores;
+                """)
+                resultados = cursor.fetchall()
+                for busca in resultados:
+                    print(f"Dono: {busca[1]}\n"
+                          f"Arquivo: {busca[0]}\n")
+                nome_arquivo = str(input("Digite o nome do arquivo que voce deseja: "))
+                id_arquivo_achado = buscar_arquivoPor_nome(conexao, nome_arquivo)
+                if id_arquivo_achado:
+                    cursor.callproc("remover_acessos", [id_arquivo_achado])
+                    conexao.commit()
+                    print("Sucesso ao remover acessos!\n")
+                else:
+                    print("Arquivo nao esta no banco, caro amigo administrador! \n")
+
+
     else:
         print("Esse adm não existe no banco de dados")
 
@@ -425,29 +487,16 @@ def main():
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
             ##safe_security(conexao)
-            registrar_operacao(conexao)
+            ##registrar_operacao(conexao)
             ##CriacaoDeViews.view_administradores(conexao)
 
             ##CriacaoDeRoles.cria_role_PapelAdm(conexao)
 
             ##verificar_atividades(conexao)
-            cursor.callproc("verificar_atividades")
-            conexao.commit()
-            for result in cursor.stored_results():
-                print(result.fetchall())
-
             ##conta_usuario(conexao)
-            total_usuarios = 0
-            total_usuarios = cursor.callproc("ContaUsuarios", [2,total_usuarios])
-            print(f"Total de usuários: {total_usuarios[1]}")
-
             ##chavear_arquivo(conexao)
-            #cursor.callproc("chavear_arquivo", [1])
-            #conexao.commit()
+            remover_acessos(conexao)
 
-            ##remover_acessos(conexao)
-            #cursor.callproc("remover_acessos", [2])
-            #conexao.commit()
 
             resp = -1
             while (resp != 0):
