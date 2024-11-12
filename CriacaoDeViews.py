@@ -68,7 +68,6 @@ def view_historico_usuario(conexao):
         INNER JOIN usuarios u ON o.id_usuario = u.id_usuario
         WHERE o.id_usuario = @id_usuario_logado;                                                                                                                                      
         """)
-        cursor.execute("GRANT SELECT ON historico_operacoes_usuario TO usuario_logado;")
         conexao.commit()
         print(" A view: 'view_historico_usuario' foi criada com sucesso!")
     except Error as erro:
