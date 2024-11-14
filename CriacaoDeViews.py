@@ -13,9 +13,8 @@ def view_arquivo_usuario(conexao, id_usuario_logado):
             a.tam,
             a.data_ult_modificacao
         FROM arquivos a
-        LEFT JOIN compartilhamentos c ON c.id_arquivo = a.id_arquivo
-        WHERE a.id_usuario = %s OR c.id_usuario_compartilhado = %s;
-        """, (id_usuario_logado, id_usuario_logado))
+        LEFT JOIN compartilhamentos c ON c.id_arquivo = a.id_arquivo;
+        """)
 
         conexao.commit()
         print("A view 'arquivos_usuario' foi criada com sucesso!")
@@ -70,9 +69,8 @@ def view_historico_usuario(conexao):
         o.data_op,
         o.hora_op,
         o.tipo_operecao
-        FROM operacoes o
-        WHERE o.id_usuario = %s;                                                                                                                                      
-        """, (id_usuario_logado,))
+        FROM operacoes o;                                                                                                                                      
+        """)
         conexao.commit()
         print(" A view: 'view_historico_usuario' foi criada com sucesso!")
     except Error as erro:
