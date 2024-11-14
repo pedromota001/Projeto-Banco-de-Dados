@@ -213,3 +213,21 @@ def busca_atv_recentes(conexao, id_arquivo):
         return None
     finally:
         cursor.close()
+
+def busca_adm_por_id(conexao, id_adm):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        SELECT * FROM administradores 
+        WHERE id_adm = %s
+        """, (id_adm,))
+        adm = cursor.fetchall()
+        if adm:
+            return adm
+        else:
+            return None
+    except Error as erro:
+        print(f"Erro ao buscar adm pelo id: {erro}")
+        return None
+    finally:
+        cursor.close()

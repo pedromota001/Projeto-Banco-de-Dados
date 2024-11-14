@@ -3,7 +3,7 @@ import mysql.connector
 from mysql.connector import Error
 
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, buscar_adm_por_email, \
-    buscar_plano_por_nome, buscar_instituicao_por_nome
+    buscar_plano_por_nome, buscar_instituicao_por_nome, busca_adm_por_id
 
 
 def insert_arquivos(conexao, id_usuario):
@@ -192,17 +192,14 @@ def insert_administradores(conexao):
         cursor.close()
 
 
-def insert_suportes(conexao):
+def insert_suportes(conexao,id_adm):
     try:
         cursor = conexao.cursor()
-        dia = input("Digite a data do suporte (AAAA-MM-DD): ")
-        hora = input("Digite a hora do suporte (HH:MM:SS): ")
+        dia = datetime.now().date
+        hora = datetime.now().time
         descricao = input("Digite a descrição do suporte: ")
-        email_adm = input("Digite o email do administrador responsável pelo suporte: ")
-
-        id_adm = buscar_adm_por_email(conexao, email_adm)
-
-        if id_adm:
+        adm = busca_adm_por_id(conexao, id_adm)
+        if adm:
             cursor.execute("INSERT INTO suportes(dia, hora, descricao, id_adm) VALUES (%s, %s, %s, %s);",
                            (dia, hora, descricao, id_adm))
             conexao.commit()
@@ -227,6 +224,20 @@ def insert_atv_recentes(conexao, id_arquivo):
         print("Atividade recente inserida com sucesso! \n")
     except Error as erro:
         print(f"Erro ao inserir na tabela de atividades recentes {erro}")
+        return None
+    finally:
+        cursor.close()
+
+def insert_adm_usuarios(conexao, id_adm, id_usuario):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("""
+        INSERT INTO adm_usuarios(id_adm, id_usuario)
+        VALUES(%s, %s);
+        """, (id_adm, id_usuario))
+        conexao.commit()
+    except Error as erro:
+        print(f"Erro ao inserir na tabela de adm_usuarios: {erro}")
         return None
     finally:
         cursor.close()

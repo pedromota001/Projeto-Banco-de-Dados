@@ -3,6 +3,7 @@ from datetime import datetime
 import mysql.connector
 from mysql.connector import Error
 
+import random
 import BuscasNoBanco
 import CriacaoDeRoles
 import CriacaoDeViews
@@ -13,7 +14,7 @@ from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_
 from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento
 from Triggers import safe_security, registrar_operacao
 from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios, \
-    insert_historico_versionamento, insert_atv_recentes
+    insert_historico_versionamento, insert_atv_recentes, insert_suportes, insert_adm_usuarios
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
 
 
@@ -367,7 +368,13 @@ def exibeMenuUsuario(conexao):
                     else:
                         print("Arquivo não existe no banco!")
             elif op == 9:
-                pass
+                cursor = conexao.cursor()
+                id_adm = random.randint(1,3)
+                insert_suportes(conexao, id_adm)
+                insert_adm_usuarios(conexao, id_adm, usuario)
+                print("Encaminhando voce ao suporte com um administrador...")
+                
+
 
     else:
         print("Usuário não cadastrado no banco")
