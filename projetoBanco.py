@@ -397,6 +397,7 @@ def exibe_menu_adm(conexao):
             6 - Contar quantos usuarios possuem um mesmo arquivo
             7 - NP
             8 - Remover acesso de usuarios sobre um arquivo(Menos o dono)
+            9 - Verificar se arquivo foi modificado há muito tempo
             0 - Sair
             """)
             op = int(input("Digite sua opção: "))
@@ -464,6 +465,28 @@ def exibe_menu_adm(conexao):
                     print("Sucesso ao remover acessos!\n")
                 else:
                     print("Arquivo nao esta no banco, caro amigo administrador! \n")
+            else:
+                cursor.execute("""
+                SELECT a.nome_arquivo FROM view_administradores;
+                """)
+                arquivos = cursor.fetchall()
+                print("Arquivos no banco: \n")
+                for arquivo in arquivos:
+                    print(f"Arquivo: {arquivo}\n")
+                nome_arquivo = str(input("Digite o nome do arquivo que voce deseja ver a data"))
+                data_ult_modif_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
+                if data_ult_modif_arquivo:
+                    cursor.execute("""
+                    SELECT verificar_arquivo_antigo(%s);
+                    """, data_ult_modif_arquivo)
+                    resultado = conexao.fetchone()[0]
+                    resultado_final = resultado(bool)
+                    if resultado_final == True:
+                        pass
+                        #implementar
+                    else:
+                        print("Arquivo teve modificao feita em menos de 100 dias! ")
+
 
 
     else:
