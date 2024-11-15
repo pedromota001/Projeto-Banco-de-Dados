@@ -11,7 +11,7 @@ import RemocaoNoBanco
 import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
     buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo, busca_atv_recentes
-from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento
+from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento, remove_arquivo_atividades_recentes
 from Triggers import safe_security, registrar_operacao
 from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios, \
     insert_historico_versionamento, insert_atv_recentes, insert_suportes, insert_adm_usuarios
@@ -89,7 +89,7 @@ def criar_tabelas(cursor):
             data_ult_modificacao DATE,
             id_usuario INT,
             PRIMARY KEY(id_arquivo), 
-            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario)
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario) 
         );
     """)
     print("Tabela 'arquivos' criada com sucesso")
@@ -103,8 +103,8 @@ def criar_tabelas(cursor):
             id_usuario INT,
             id_arquivo INT,
             PRIMARY KEY(id_comentario),
-            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario),
-            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+            FOREIGN KEY(id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo) ON DELETE CASCADE
         );
     """)
     print("Tabela 'comentarios' criada com sucesso")
@@ -119,7 +119,7 @@ def criar_tabelas(cursor):
             conteudo_mudado VARCHAR(50),
             id_arquivo INT,
             PRIMARY KEY (id_historico),
-            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo) ON DELETE CASCADE
         ); 
     """)
     print("Tabela 'historico_versionamento' criada com sucesso.")
@@ -147,7 +147,7 @@ def criar_tabelas(cursor):
             PRIMARY KEY(id_compartilhado),
             FOREIGN KEY(id_usuario_dono) REFERENCES usuarios(id_usuario),
             FOREIGN KEY(id_usuario_compartilhado) REFERENCES usuarios(id_usuario),
-            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+            FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo) ON DELETE CASCADE
         );
     """)
     print("Tabela 'compartilhamentos' criada com sucesso.")
@@ -194,7 +194,7 @@ def criar_tabelas(cursor):
                 acesso VARCHAR(2),
                 id_arquivo INT,
                 PRIMARY KEY(id_atv_rec),
-                FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo)
+                FOREIGN KEY(id_arquivo) REFERENCES arquivos(id_arquivo) ON DELETE CASCADE
             ); 
         """)
     print("Tabela 'atividades_recentes' criada com sucesso.")
@@ -234,6 +234,7 @@ def exibeMenuUsuario(conexao):
             7 - Fazer operações em arquivos
             8 - Listar comentário de arquivo
             9 - Pedir suporte a adm
+            10 - Visualizar seu historico de operações em arquivos
             0 - Sair
             """)
             op = int(input("Digite sua opção: "))
@@ -302,8 +303,11 @@ def exibeMenuUsuario(conexao):
                     \n
                     """)
                     tipo_operacao = int(input("Especifique o tipo de operação que você deseja fazer: "))
+                    date_op = datetime.now().date()
+                    hora_op = datetime.now().time()
                     if tipo_operacao == 1:
                         operacao = "carregar"
+                        insert_operacoes(conexao, date_op, hora_op, operacao, usuario)
                         insert_historico_versionamento(conexao, id_arquivo_achado, usuario, operacao)
                         atividade_existe = busca_atv_recentes(conexao, id_arquivo_achado)
                         if atividade_existe:
@@ -314,6 +318,8 @@ def exibeMenuUsuario(conexao):
                         pass
                     elif tipo_operacao == 2:
                         operacao = "Atualização"
+                        print("a")
+                        insert_operacoes(conexao, date_op, hora_op, operacao, usuario)
                         print("""
                         1 - Atualizar nome
                         2 - Atualizar permissão 
@@ -373,7 +379,18 @@ def exibeMenuUsuario(conexao):
                 insert_suportes(conexao, id_adm)
                 insert_adm_usuarios(conexao, id_adm, usuario)
                 print("Encaminhando voce ao suporte com um administrador...")
-                
+            elif op == 10:
+                cursor = conexao.cursor()
+                cursor.execute("""
+                SELECT data_op, hora_op, tipo_operacao FROM operacoes
+                WHERE id_usuario = %s
+                """, (usuario,))
+                historico = cursor.fetchall()
+                if historico:
+                    for operacao in historico:
+                        print(f"Data operação: {operacao[0]}// Hora operação: {operacao[1]}// Tipo: {operacao[2]}\n")
+                else:
+                    print("Você não foi nenhuma operação em arquivos no banco(Com exceção da criação ou remoção)")
 
 
     else:
@@ -482,8 +499,8 @@ def exibe_menu_adm(conexao):
                     resultado = conexao.fetchone()[0]
                     resultado_final = resultado(bool)
                     if resultado_final == True:
-                        pass
-                        #implementar
+                        id_arquivo = buscar_arquivoPor_nome(conexao, nome_arquivo)
+                        remove_arquivo_atividades_recentes(conexao, id_arquivo)                
                     else:
                         print("Arquivo teve modificao feita em menos de 100 dias! ")
 
@@ -519,13 +536,13 @@ def main():
             ##safe_security(conexao)
             ##registrar_operacao(conexao)
             ##CriacaoDeViews.view_administradores(conexao)
-
+            ##CriacaoDeViews.view_historico_usuario(conexao)
             ##CriacaoDeRoles.cria_role_PapelAdm(conexao)
 
             ##verificar_atividades(conexao)
             ##conta_usuario(conexao)
             ##chavear_arquivo(conexao)
-            remover_acessos(conexao)
+            ##remover_acessos(conexao)
 
 
             resp = -1

@@ -68,7 +68,7 @@ def view_historico_usuario(conexao):
         SELECT
         o.data_op,
         o.hora_op,
-        o.tipo_operecao
+        o.tipo_operacao
         FROM operacoes o;                                                                                                                                      
         """)
         conexao.commit()
