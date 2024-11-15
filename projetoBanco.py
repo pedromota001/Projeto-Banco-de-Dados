@@ -12,7 +12,7 @@ import insercaoNoBanco
 from BuscasNoBanco import buscar_arquivos_usuario, buscar_usuario_email, buscar_arquivoPor_nome, \
     buscar_arquivos_proprios_compartilhados, buscar_comentarios_arquivo, busca_atv_recentes
 from RemocaoNoBanco import remove_arquivo_por_id, remocao_historico_versionamento, remove_arquivo_atividades_recentes
-from Triggers import safe_security, registrar_operacao
+from Triggers import safe_security, registrar_operacao, atualiza_acesso
 from insercaoNoBanco import insert_compartilhamentos, insert_operacoes, insert_comentarios, \
     insert_historico_versionamento, insert_atv_recentes, insert_suportes, insert_adm_usuarios
 from procedures import verificar_atividades, conta_usuario, chavear_arquivo, remover_acessos
@@ -533,11 +533,17 @@ def main():
             cursor = conexao.cursor()
             criar_banco_de_dados(cursor)
             criar_tabelas(cursor)
+            ##atualiza_acesso(conexao)
             ##safe_security(conexao)
             ##registrar_operacao(conexao)
+
             ##CriacaoDeViews.view_administradores(conexao)
             ##CriacaoDeViews.view_historico_usuario(conexao)
+            ##CriacaoDeViews.view_historico_usuario(conexao)
+
             ##CriacaoDeRoles.cria_role_PapelAdm(conexao)
+            ##CriacaoDeRoles.cria_role_PapelEmpresa(conexao)
+            ##CriacaoDeRoles.cria_role_PapelUsuario(conexao)
 
             ##verificar_atividades(conexao)
             ##conta_usuario(conexao)
